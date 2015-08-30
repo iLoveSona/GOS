@@ -1770,9 +1770,9 @@ function Rectangle.new(x, y, width, height)
 	return this
 end
 
-Circle={}
+DCircle={}
 
-function Circle.new(x, y, radius)
+function DCircle.new(x, y, radius)
 	local this = {}
 	
 	if type(x)=="table" then
