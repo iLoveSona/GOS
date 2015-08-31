@@ -1,17 +1,6 @@
-OnLoop(function(myHero)
-	killableInfo()
-	local target = GetCurrentTarget()
-	if ValidTarget(target, math.huge) then
-		-- DrawText(GetObjectName(target),20,0,150,0xff00ff00)
-		if KeyIsDown(32) then
-			castE(target)
-			castW(target)
-			castQ(target)
-		end
-	end
-end)
+require 'Inspired'
 
-function castQ( target )
+local function castQ( target )
 	-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
 	pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_Q),200,false,true)
 	if IsInDistance(target, GetCastRange(myHero,_Q)) and CanUseSpell(myHero,_Q) == READY and pred.HitChance == 1 then	
@@ -19,7 +8,7 @@ function castQ( target )
 	end
 end
 
-function castW( target )
+local function castW( target )
 	-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
 	pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_W),800,false,true)
 	if IsInDistance(target, GetCastRange(myHero,_W)) and CanUseSpell(myHero,_W) == READY and pred.HitChance == 1 then	
@@ -27,7 +16,7 @@ function castW( target )
 	end
 end
 
-function castE( target )
+local function castE( target )
 	-- open E
 	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY and GotBuff(myHero,"KarthusDefile") <= 0 then
 		CastTargetSpell(myHero, _E)
@@ -39,7 +28,7 @@ function castE( target )
 	end
 end
 
-function killableInfo()
+local function killableInfo()
 	-- no need show killable info when R in cd
 	if CanUseSpell(myHero,_R) ~= READY then return end
 
@@ -62,5 +51,17 @@ function killableInfo()
   end
   DrawText(info,40,500,0,0xffff0000) 
 end
+
+OnLoop(function(myHero)
+	killableInfo()
+	local target = GetCurrentTarget()
+	if ValidTarget(target) then
+		if KeyIsDown(32) then
+			castE(target)
+			castW(target)
+			castQ(target)
+		end
+	end
+end)
 
 PrintChat("simple karthus script loaded")

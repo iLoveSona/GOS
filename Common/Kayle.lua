@@ -1,5 +1,6 @@
+require 'Inspired'
+
 OnLoop(function(myHero)
-	-- DrawText("simple kayle script loaded",20,0,0,0xffffffff)
 	local target = GetCurrentTarget()
 	if KeyIsDown(32) and ValidTarget(target) then
 		-- Kayle' E range 525

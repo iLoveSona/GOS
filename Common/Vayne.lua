@@ -1,13 +1,11 @@
+require 'Inspired'
 require 'MapPositionGOS'
 require 'Interrupter'
 
-myHero = GetMyHero()
-OnLoop(function(myHero)
-	AutoEiAC()
-end)
+local myHero = GetMyHero()
 
 -- modify from IAC vayne
-function AutoEiAC()
+local function AutoEiAC()
 	local target = GetCurrentTarget()
 	if ValidTarget(target,GetCastRange(myHero,_E)) and IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then
 		for _=0,450,GetHitBox(target) do
@@ -25,6 +23,10 @@ addInterrupterCallback(function(target, spellType)
 	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then
 		CastTargetSpell(target, _E)
 	end
+end)
+
+OnLoop(function(myHero)
+	AutoEiAC()
 end)
 
 PrintChat("simple vayne loaded")
