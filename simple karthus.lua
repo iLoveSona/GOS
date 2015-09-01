@@ -1,3 +1,5 @@
+if GetObjectName(GetMyHero()) ~= "Karthus" then return end
+
 require 'Inspired'
 
 local function castQ( target )

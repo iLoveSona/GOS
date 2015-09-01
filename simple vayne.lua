@@ -1,3 +1,5 @@
+if GetObjectName(GetMyHero()) ~= "Vayne" then return end
+
 require 'Inspired'
 require 'MapPositionGOS'
 require 'Interrupter'

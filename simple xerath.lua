@@ -1,9 +1,11 @@
+if GetObjectName(GetMyHero()) ~= "Xerath" then return end
 -- known issue:
 -- dead buff(kog, karthus) cause get target fail
 -- recall cause pred fail(way point bug? only happen with AI)
 
--- require 'Inspired'
+require 'Inspired'
 require 'Interrupter'
+
 local debug = false
 local DrawDebugText = DrawText
 if not debug then DrawDebugText = function ( ... ) end end
@@ -12,52 +14,12 @@ local myHero = GetMyHero()
 
 local semiAuto = false
 local semiAutoDelay = 0
-OnLoop(function(myHero)
-
-	DrawDebugText("Q range "..GetCastRange(myHero,_Q),20,200,30,0xff00ff00)
-	DrawDebugText("R range "..GetCastRange(myHero,_R),20,0,30,0xff00ff00)
-	DrawDebugText("buff XerathArcanopulseChargeUp: "..GotBuff(myHero,"XerathArcanopulseChargeUp"),20,0,150,0xff00ff00)
-	DrawDebugText("buff XerathLocusOfPower2: "..GotBuff(myHero,"XerathLocusOfPower2"),20,0,170,0xff00ff00)
-	DrawDebugText("OnProcessSpell name : "..castname,20,0,250,0xff00ff00)
-
-	killableInfo()
-
-	-- TODO: rework this toggle feature with new api(hope we have)
-	if KeyIsDown(17) and semiAutoDelay < GetTickCount() then
-		semiAuto = not semiAuto
-		semiAutoDelay = GetTickCount() + 500
-	end
-	if semiAuto then
-		DrawText("semi-auto R mode : ON", 40,600,200,0xffffff00)
-	end
 
 
-	local target = GetCurrentTarget()
-	if ValidTarget(target) then
-		if GetObjectName(target) then
-			DrawDebugText("target "..GetObjectName(target),20,0,100,0xff00ff00)
-		end
-	
-		castR(target)
-
-		checkQ()
-		if KeyIsDown(32) then	
-			castQ(target)
-			castW(target)
-			castE(target)
-		end
-	end
-end)
-
-OnProcessSpell(function(unit,spell)
-	if spell.name:lower():find("xerath") then
-		castname = spell.name
-	end
-end)
 
 local qTime = 0
 local qRange = 0
-function checkQ()
+local function checkQ()
 	if GotBuff(myHero,"XerathArcanopulseChargeUp") > 0 then
 		if qTime == 0 then qTime = GetTickCount() end
 	else
@@ -75,7 +37,7 @@ function checkQ()
   DrawDebugText("Q range "..qRange,20,200,100,0xff00ff00)
 end
 
-function castQ( target )
+local function castQ( target )
 	
 	if IsInDistance(target, 1500) and CanUseSpell(myHero,_Q) == READY then	
 		
@@ -99,7 +61,7 @@ function castQ( target )
 	end
 end
 
-function castW( target )	
+local function castW( target )	
 	if IsInDistance(target, GetCastRange(myHero,_W)) and CanUseSpell(myHero,_W) == READY then	
 		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
 		local pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_W),150,false,true)
@@ -109,7 +71,7 @@ function castW( target )
 	end
 end
 
-function castE( target )	
+local function castE( target )	
 	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then	
 		local myHeroPos = GetMyHeroPos()
 		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
@@ -125,7 +87,7 @@ local rTarget
 local rDelay
 local rChangeTargetDelay
 local rRange = 0
-function castR( target )
+local function castR( target )
 	-- save r range because r range change to 25000 when casting
 	if GotBuff(myHero,"XerathLocusOfPower2") == 0 then 	rRange = GetCastRange(myHero,_R) end
 
@@ -178,7 +140,7 @@ function castR( target )
 	end
 end
 
-function killableInfo()
+local function killableInfo()
 	-- skip when R in cd
 	-- if CanUseSpell(myHero,_R) ~= READY then return end
 
@@ -201,7 +163,49 @@ function killableInfo()
   DrawText(info,40,500,0,0xffff0000) 
 end
 
--- AddGapcloseEvent(_E, GetCastRange(myHero,_E), false)
+OnLoop(function(myHero)
+
+	DrawDebugText("Q range "..GetCastRange(myHero,_Q),20,200,30,0xff00ff00)
+	DrawDebugText("R range "..GetCastRange(myHero,_R),20,0,30,0xff00ff00)
+	DrawDebugText("buff XerathArcanopulseChargeUp: "..GotBuff(myHero,"XerathArcanopulseChargeUp"),20,0,150,0xff00ff00)
+	DrawDebugText("buff XerathLocusOfPower2: "..GotBuff(myHero,"XerathLocusOfPower2"),20,0,170,0xff00ff00)
+	DrawDebugText("OnProcessSpell name : "..castname,20,0,250,0xff00ff00)
+
+	killableInfo()
+
+	-- TODO: rework this toggle feature with new api(hope we have)
+	if KeyIsDown(17) and semiAutoDelay < GetTickCount() then
+		semiAuto = not semiAuto
+		semiAutoDelay = GetTickCount() + 500
+	end
+	if semiAuto then
+		DrawText("semi-auto R mode : ON", 40,600,200,0xffffff00)
+	end
+
+
+	local target = GetCurrentTarget()
+	if ValidTarget(target) then
+		if GetObjectName(target) then
+			DrawDebugText("target "..GetObjectName(target),20,0,100,0xff00ff00)
+		end
+	
+		castR(target)
+
+		checkQ()
+		if KeyIsDown(32) then	
+			castQ(target)
+			castW(target)
+			castE(target)
+		end
+	end
+end)
+
+OnProcessSpell(function(unit,spell)
+	if spell.name:lower():find("xerath") then
+		castname = spell.name
+	end
+end)
+
 addInterrupterCallback(function(target, spellType)
 	castE(target)
 end)

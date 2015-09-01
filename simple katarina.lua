@@ -3,6 +3,7 @@ if GetObjectName(GetMyHero()) ~= "Katarina" then return end
 require("Inspired")
 require("IAC")
 require("simpleWardJump")
+
 myIAC = IAC()
 
 OnLoop(function(myHero)

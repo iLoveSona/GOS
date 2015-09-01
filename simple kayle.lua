@@ -1,10 +1,12 @@
+if GetObjectName(GetMyHero()) ~= "Kayle" then return end
+
 require 'Inspired'
 
 OnLoop(function(myHero)
 	local target = GetCurrentTarget()
 	if KeyIsDown(32) and ValidTarget(target) then
 		-- Kayle' E range 525
-		if IsInDistance(target, 525) and CanUseSpell(myHero, _E) == READY then	
+		if IsInDistance(target, 525) and CanUseSpell(myHero, _E) == READY then
 			-- CastTargetSpell(myHero, _E)
 			CastSpell(_E)
 		end
