@@ -1,5 +1,8 @@
-local version = 6
+local version = 7
+
 require ("DLib")
+
+local print = print
 
 closeConsole()
 
