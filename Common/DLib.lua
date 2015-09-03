@@ -1,8 +1,4 @@
-local version = 6
--- 2015.08.29 update version to 6 by iLoveSona
--- fix MenuBool drag bug
--- fix MenuStringList select will mofity other MenuStringList item bug
--- add init value for menuList
+local version = 7
 
 function prequire(m) 
   local ok, err = pcall(require, m) 
@@ -238,6 +234,7 @@ function Notification.new(message, duration, drawcolor, textcolor, animationscal
 	this.y=y
 	this.toremove=false
 	this.creationTime=GetTickCount()+300*animationscale
+	this.fontsize = fontsize or 14
 	
 	function this.updateX(tickcount)
 		if tickcount>this.creationTime and tickcount<this.creationTime+this.duration  then this.x=7 return end
@@ -253,8 +250,8 @@ function Notification.new(message, duration, drawcolor, textcolor, animationscal
 		
 	function this.onLoop(tickcount)
 		this.updateX(tickcount)
-		FillRect(this.x,this.y,200,50,this.drawcolor) 
-		DrawText(this.message,14,this.x+3, this.y+5, this.textcolor)
+		FillRect(this.x, this.y, 0.4 * #this.message * this.fontsize, 1.5 * this.fontsize, this.drawcolor) 
+		DrawText(this.message,this.fontsize,this.x+3, this.y+5, this.textcolor)
 	end
 	return this
 end
@@ -2004,7 +2001,7 @@ updaterActive=menu.addItem(MenuBool.new("Updater active", true))
 
 g=prequire("GOSUtility")
 if g then
-	local UP=Updater.new("DrakeSharp/GOS/master/Common/DLib.lua", "Common\\DLib", version)
+	local UP=Updater.new("iLoveSona/GOS/master/Common/DLib.lua", "Common\\DLib", version)
 	if UP.newVersion() then UP.update() end
 else
 	PrintChat("GOSUtility.dll not found. Functions using GOSUtility won't work.")
