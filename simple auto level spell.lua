@@ -33,6 +33,23 @@ local spellSequencePre3 = {
 	spellTable[submenuSpellTablePre3List[2].getValue()],
 	spellTable[submenuSpellTablePre3List[3].getValue()],
 }
+
+-- local function init()
+-- 	spellSequence = {
+-- 		spellTable[submenuSpellTableList[1].getValue()],
+-- 		spellTable[submenuSpellTableList[2].getValue()],
+-- 		spellTable[submenuSpellTableList[3].getValue()],
+-- 		spellTable[submenuSpellTableList[4].getValue()],
+-- 	}
+-- 	spellSequencePre3 = {
+-- 		spellTable[submenuSpellTablePre3List[1].getValue()],
+-- 		spellTable[submenuSpellTablePre3List[2].getValue()],
+-- 		spellTable[submenuSpellTablePre3List[3].getValue()],
+-- 	}
+-- end
+
+-- init()
+
 -- PrintChat(spellSequence[1]..spellSequence[2]..spellSequence[3]..spellSequence[4])
 local lv = 0
 
@@ -47,17 +64,37 @@ local function doLevelSpell()
 end
 
 OnLoop(function(myHero)
-	-- only level spell when level up
-	if lv == GetLevel(myHero) then return end
+	local newLv = GetLevel(myHero)
 
-	lv = GetLevel(myHero)
+	-- only level spell when level up
+	if lv == newLv then return end
+	lv = newLv
+
 	if disableAtLv1.getValue() and lv == 1 then return end
 	-- if lv < 6 then return end
-	if lv <= 3 then
+	if lv <= 3 and spellSequencePre3 then
 		doLevelSpellPre3()
 	else
 		doLevelSpell()
 	end
+
+	
 end)
 
+-- api table
+local s = {}
+
+ function s.setLvSpellSequence(m_spellSequence, m_spellSequencePre3, m_disableAtLv1)
+	-- TODO should change the menu value instead just change list directly
+	spellSequence = m_spellSequence
+	spellSequencePre3 = m_spellSequencePre3
+	disableAtLv1.setValue(m_disableAtLv1 or false)
+	-- init()
+
+	PrintChat("simple auto level spell for "..name.." lib mode ON, menu setting will overwrite by script")
+	return true
+end
+
 PrintChat("simple auto level spell for "..name.." loaded")
+
+return s
