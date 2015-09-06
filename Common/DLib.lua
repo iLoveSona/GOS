@@ -1,9 +1,25 @@
-local version = 7
+local version = 8
+
+local require2 = _G.require
+-- better handle require error
+function require( m )
+	ok, err = pcall(require2, m)
+	if not ok then
+		-- detect noob require a webpage error
+		if string.find(err, "unexpected symbol near '<'") then PrintChat("<font color=\"#FF1919\"><b>LOAD \""..m..".lua\" SCRIPT ERROR: make sure you download the script code instead webpage</b></font>")
+		else
+			PrintChat(err)
+		end
+		return nil, err
+	end
+	return err
+end
 
 function prequire(m) 
-  local ok, err = pcall(require, m) 
-  if not ok then return nil, err end
-  return err
+  -- local ok, err = pcall(require, m) 
+  -- if not ok then return nil, err end
+  -- return err
+  return require(m)
 end
 
 function requireDL(script, address, retry)
