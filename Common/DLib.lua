@@ -1,12 +1,35 @@
-local version = 8
+local version = 9
 
 local require2 = _G.require
+
+libTable = {
+	-- ["DLib"] = "iLoveSona/GOS/master/Common/DLib.lua",
+	["simple ward jump"] = "iLoveSona/GOS/master/simple%20ward%20jump.lua",
+	["simple auto level spell"] = "iLoveSona/GOS/master/simple%20auto%20level%20spell.lua",
+	["Interrupter"] = "iLoveSona/GOS/master/Common/Interrupter.lua",
+	["Inspired"] = "Inspired-gos/scripts/master/Common/Inspired.lua",
+	["IOW"] = "Inspired-gos/scripts/master/Common/IOW.lua",
+	-- ["IAC"] = "Inspired-gos/scripts/master/Common/IAC.lua",
+	["MapPosition"] = "Maxxxel/GOS/master/Common/Utility/MapPosition.lua",
+	["MapPositionGOS"] = "Maxxxel/GOS/master/Common/Utility/MapPositionGOS.lua",
+	["MapPosition_bushes"] = "Maxxxel/GOS/master/Common/Utility/MapPosition_bushes.lua",
+	["MapPosition_walls"] = "Maxxxel/GOS/master/Common/Utility/MapPosition_walls.lua",
+	["2DGeometry"] = "Maxxxel/GOS/master/Common/Utility/2DGeometry.lua",
+	["IsFacing"] = "Maxxxel/GOS/master/Common/Utility/IsFacing.lua"
+}
+
 -- better handle require error
 function require( m )
 	ok, err = pcall(require2, m)
 	if not ok then
+		local url = libTable[m]
+  	if  url then 
+  		print(err)
+  		PrintChat("<font color=\"#00CCFF\"><b>LOAD \""..m..".lua\" FAIL, auto fix mode: try redownload the script, plz waiting...</b></font>")
+  		saveScript("Common\\"..m, webRequest("github", url.."?rand="..math.random(1,10000)))
+  		PrintChat("<font color=\"#00CCFF\"><b> auto fix mode: \""..m..".lua\" updated, press F6-F6 to reload.</b></font>")
 		-- detect noob require a webpage error
-		if string.find(err, "unexpected symbol near '<'") then PrintChat("<font color=\"#FF1919\"><b>LOAD \""..m..".lua\" SCRIPT ERROR: make sure you download the script code instead webpage</b></font>")
+		elseif string.find(err, "unexpected symbol near '<'") then PrintChat("<font color=\"#FF1919\"><b>LOAD \""..m..".lua\" SCRIPT ERROR: make sure you download the script code instead webpage</b></font>")
 		else
 			PrintChat(err)
 		end
