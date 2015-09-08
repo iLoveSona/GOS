@@ -1,4 +1,4 @@
-local version = 9
+local version = 10
 
 local require2 = _G.require
 
@@ -1320,6 +1320,10 @@ end
 function gVersion()
 	return g.version()
 end
+
+function lolVersion()
+	return g.getLolVersion()
+end
 --ENDREGION GOSUTILITY---------------------------------------------------------}
 
 --REGION key and mouse events--------------------------------------------------
@@ -2042,6 +2046,11 @@ g=prequire("GOSUtility")
 if g then
 	local UP=Updater.new("iLoveSona/GOS/master/Common/DLib.lua", "Common\\DLib", version)
 	if UP.newVersion() then UP.update() end
+	if gVersion()<3 then 
+		notification("plz Redownload GOSUtility", 10000) 
+	else
+		PrintChat("lol version : "..lolVersion())
+	end	
 else
 	PrintChat("GOSUtility.dll not found. Functions using GOSUtility won't work.")
 end
