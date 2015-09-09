@@ -1,4 +1,4 @@
-local version = 10
+local version = 11
 
 local require2 = _G.require
 
@@ -2046,10 +2046,15 @@ g=prequire("GOSUtility")
 if g then
 	local UP=Updater.new("iLoveSona/GOS/master/Common/DLib.lua", "Common\\DLib", version)
 	if UP.newVersion() then UP.update() end
-	if gVersion()<3 then 
+	if gVersion()<4 then 
 		notification("plz Redownload GOSUtility", 10000) 
 	else
-		PrintChat("lol version : "..lolVersion())
+		local versionCode = lolVersion()
+		if versionCode then	
+			PrintChat("lol version : "..versionCode) 
+		else 
+			PrintChat("lol version not found") 
+		end
 	end	
 else
 	PrintChat("GOSUtility.dll not found. Functions using GOSUtility won't work.")
