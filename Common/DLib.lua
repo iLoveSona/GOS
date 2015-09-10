@@ -1,4 +1,4 @@
-local version = 14
+local version = 15
 
 local require2 = _G.require
 
@@ -19,10 +19,10 @@ libTable = {
 }
 
 -- better handle require error
-function require( m, showErr )
-	local showErr = showErr or true
+function require( m, hideErr )
+	local hideErr = hideErr or false
 	local PrintChat = _G.PrintChat
-	if not showErr then PrintChat = function ( ... )	end end
+	if hideErr then PrintChat = function ( ... ) end end
 	ok, err = pcall(require2, m)
 	if not ok then
 		local url = libTable[m]
@@ -41,11 +41,11 @@ function require( m, showErr )
 	return err
 end
 
-function prequire(m, showErr) 
+function prequire(m, hideErr) 
   -- local ok, err = pcall(require, m) 
   -- if not ok then return nil, err end
   -- return err
-  return require(m, showErr)
+  return require(m, hideErr)
 end
 
 function requireDL(script, address, retry)
@@ -1939,7 +1939,7 @@ function Config.new()
 	this.newline="\n"
 	this.config={}
 	function this.load()
-		local c=prequire(this.name, false)
+		local c=prequire(this.name, true)
 		if c~=nil and type(c)=="table" then
 			this.config=c
 		end
