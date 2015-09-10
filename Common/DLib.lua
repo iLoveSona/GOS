@@ -1,4 +1,4 @@
-local version = 13
+local version = 14
 
 local require2 = _G.require
 
@@ -19,7 +19,10 @@ libTable = {
 }
 
 -- better handle require error
-function require( m )
+function require( m, showErr )
+	local showErr = showErr or true
+	local PrintChat = _G.PrintChat
+	if not showErr then PrintChat = function ( ... )	end end
 	ok, err = pcall(require2, m)
 	if not ok then
 		local url = libTable[m]
@@ -38,11 +41,11 @@ function require( m )
 	return err
 end
 
-function prequire(m) 
+function prequire(m, showErr) 
   -- local ok, err = pcall(require, m) 
   -- if not ok then return nil, err end
   -- return err
-  return require(m)
+  return require(m, showErr)
 end
 
 function requireDL(script, address, retry)
@@ -1034,7 +1037,7 @@ function MenuStringList.new(name, stringlist, index)
 	local this = {}
 	this.name = name or "Unnamed"
 	this.stringlist=stringlist or {"Empty"}
-	this.selectedIndex=index
+	this.selectedIndex=index or 1
 	this.parent=parent
 	this.mainMenu=nil
 	this.textY=0
@@ -1936,7 +1939,7 @@ function Config.new()
 	this.newline="\n"
 	this.config={}
 	function this.load()
-		local c=prequire(this.name)
+		local c=prequire(this.name, false)
 		if c~=nil and type(c)=="table" then
 			this.config=c
 		end
