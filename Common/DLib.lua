@@ -1,4 +1,4 @@
-local version = 12
+local version = 13
 
 local require2 = _G.require
 
@@ -2046,7 +2046,7 @@ g=prequire("GOSUtility")
 if g then
 	local UP=Updater.new("iLoveSona/GOS/master/Common/DLib.lua", "Common\\DLib", version)
 	if UP.newVersion() then UP.update() end
-	if gVersion()<5 then 
+	if gVersion()<6 then 
 		notification("plz Redownload GOSUtility", 10000) 
 	else
 		local versionCode = lolVersion()
