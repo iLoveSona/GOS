@@ -1,5 +1,3 @@
-require('Inspired')
-
 -- modify from SimpleLib.lua(iCreative)
 CHANELLING_SPELLS = {
     ["Caitlyn"]                     = {_R},
@@ -65,6 +63,7 @@ GAPCLOSER_SPELLS = {
     ["Shen"]                        = {_E},
     ["Shyvana"]                     = {_R},
     ["Talon"]                       = {_E},
+    ["TahmKench"]                  = {_R},
     ["Thresh"]                      = {_Q},
     ["Tristana"]                    = {_W},
     ["Tryndamere"]                  = {_E},
@@ -78,24 +77,25 @@ GAPCLOSER_SPELLS = {
 }
 
 local callback = nil
+local myTeam = GetTeam(GetMyHero())
 
 OnProcessSpell(function(unit, spell)    
-    if not callback or not unit or GetObjectType(unit) ~= Obj_AI_Hero  or GetTeam(unit) == GetTeam(GetMyHero()) then return end
-    local unitChanellingSpells = CHANELLING_SPELLS[GetObjectName(unit)]
-    local unitGapcloserSpells = GAPCLOSER_SPELLS[GetObjectName(unit)]
+    if not callback or not unit or GetObjectType(unit) ~= Obj_AI_Hero  or GetTeam(unit) == myTeam then return end
+    local unitName = GetObjectName(unit)
+    local unitChanellingSpells = CHANELLING_SPELLS[unitName]
+    local unitGapcloserSpells = GAPCLOSER_SPELLS[unitName]
+    local spellName = spell.name
 
-    -- if spell.target == GetMyHero() or GetDistance(spell.endPos) < 2000 then
-        if unitChanellingSpells then
-            for _, spellSlot in pairs(unitChanellingSpells) do
-                -- PrintChat(spell.name.." "..GetCastName(unit, spellSlot))
-                if spell.name == GetCastName(unit, spellSlot) then callback(unit, CHANELLING_SPELLS) end
-            end
-        elseif unitGapcloserSpells then
-            for _, spellSlot in pairs(unitGapcloserSpells) do
-                if spell.name == GetCastName(unit, spellSlot) then callback(unit, GAPCLOSER_SPELLS) end
-            end
+    if unitChanellingSpells then
+        for _, spellSlot in pairs(unitChanellingSpells) do
+            -- PrintChat(spell.name.." "..GetCastName(unit, spellSlot))
+            if spellName == GetCastName(unit, spellSlot) then callback(unit, CHANELLING_SPELLS, spell) end
         end
-	-- end
+    elseif unitGapcloserSpells then
+        for _, spellSlot in pairs(unitGapcloserSpells) do
+            if spellName == GetCastName(unit, spellSlot) then callback(unit, GAPCLOSER_SPELLS, spell) end
+        end
+    end
 end)
 
 function addInterrupterCallback( callback0 )
