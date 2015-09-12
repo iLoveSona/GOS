@@ -1,4 +1,4 @@
-local version = 15
+local version = 16
 
 local require2 = _G.require
 
@@ -12,8 +12,8 @@ libTable = {
 	-- ["IAC"] = "Inspired-gos/scripts/master/Common/IAC.lua",
 	["MapPosition"] = "Maxxxel/GOS/master/Common/Utility/MapPosition.lua",
 	["MapPositionGOS"] = "Maxxxel/GOS/master/Common/Utility/MapPositionGOS.lua",
-	["MapPosition_bushes"] = "Maxxxel/GOS/master/Common/Utility/MapPosition_bushes.lua",
-	["MapPosition_walls"] = "Maxxxel/GOS/master/Common/Utility/MapPosition_walls.lua",
+	["MapPosition_bushes_1"] = "Maxxxel/GOS/master/Common/Utility/MapPosition_bushes_1.lua",
+	["MapPosition_walls_1_1"] = "Maxxxel/GOS/master/Common/Utility/MapPosition_walls_1_1.lua",
 	["2DGeometry"] = "Maxxxel/GOS/master/Common/Utility/2DGeometry.lua",
 	["IsFacing"] = "Maxxxel/GOS/master/Common/Utility/IsFacing.lua"
 }
@@ -26,11 +26,11 @@ function require( m, hideErr )
 	ok, err = pcall(require2, m)
 	if not ok then
 		local url = libTable[m]
-  	if  url then 
-  		print(err)
-  		PrintChat("<font color=\"#00CCFF\"><b>LOAD \""..m..".lua\" FAIL, auto fix mode: try redownload the script, plz waiting...</b></font>")
-  		saveScript("Common\\"..m, webRequest("github", url.."?rand="..math.random(1,10000)))
-  		PrintChat("<font color=\"#00CCFF\"><b> auto fix mode: \""..m..".lua\" updated, press F6-F6 to reload.</b></font>")
+			if  url then 
+			print(err)
+			PrintChat("<font color=\"#00CCFF\"><b>LOAD \""..m..".lua\" FAIL, auto fix mode: try redownload the script, plz waiting...</b></font>")
+			saveScript("Common\\"..m, webRequest("github", url.."?rand="..math.random(1,10000)))
+			PrintChat("<font color=\"#00CCFF\"><b> auto fix mode: \""..m..".lua\" updated, press F6-F6 to reload.</b></font>")
 		-- detect noob require a webpage error
 		elseif string.find(err, "unexpected symbol near '<'") then PrintChat("<font color=\"#FF1919\"><b>LOAD \""..m..".lua\" SCRIPT ERROR: make sure you download the script code instead webpage</b></font>")
 		else
@@ -2055,6 +2055,7 @@ if g then
 		local versionCode = lolVersion()
 		if versionCode then	
 			PrintChat("lol version : "..versionCode) 
+			closeConsole()
 		else 
 			PrintChat("lol version : not found") 
 		end
