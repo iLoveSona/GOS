@@ -1,31 +1,43 @@
-if GetObjectName(GetMyHero()) ~= "Karthus" then return end
+local myHero = GetMyHero()
+if GetObjectName(myHero) ~= "Karthus" then return end
 
-require 'Inspired'
+local d = require 'DLib'
+local IsInDistance = d.IsInDistance
+local ValidTarget = d.ValidTarget
+local CalcDamage = d.CalcDamage
+local GetEnemyHeroes = d.GetEnemyHeroes
 
 local function castQ( target )
-	-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
-	pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_Q),200,false,true)
-	if IsInDistance(target, GetCastRange(myHero,_Q)) and CanUseSpell(myHero,_Q) == READY and pred.HitChance == 1 then	
-		CastSkillShot(_Q,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
+	if IsInDistance(target, GetCastRange(myHero,_Q)) and CanUseSpell(myHero,_Q) == READY then	
+		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
+		local pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_Q),200,false,true)
+		if pred.HitChance == 1 then	
+			CastSkillShot(_Q,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
+		end
 	end
 end
 
 local function castW( target )
-	-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
-	pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_W),800,false,true)
-	if IsInDistance(target, GetCastRange(myHero,_W)) and CanUseSpell(myHero,_W) == READY and pred.HitChance == 1 then	
-		CastSkillShot(_W,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
+	if IsInDistance(target, GetCastRange(myHero,_W)) and CanUseSpell(myHero,_W) == READY then	
+		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
+		local pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_W),800,false,true)
+		if pred.HitChance == 1 then	
+			CastSkillShot(_W,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
+		end
 	end
 end
 
 local function castE( target )
+	local isInDistance = IsInDistance(target, GetCastRange(myHero,_E))
+	local eBuff = GotBuff(myHero,"KarthusDefile")
+
 	-- open E
-	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY and GotBuff(myHero,"KarthusDefile") <= 0 then
+	if isInDistance and CanUseSpell(myHero,_E) == READY and eBuff <= 0 then
 		CastTargetSpell(myHero, _E)
 	end
 
 	-- close E
-	if not IsInDistance(target, GetCastRange(myHero,_E)) and GotBuff(myHero,"KarthusDefile") > 0 then
+	if not isInDistance and eBuff > 0 then
 		CastTargetSpell(myHero, _E)
 	end
 end
@@ -34,7 +46,7 @@ local function killableInfo()
 	-- no need show killable info when R in cd
 	if CanUseSpell(myHero,_R) ~= READY then return end
 
-	rDmg = 100 + GetCastLevel(myHero,_R) * 150 + GetBonusAP(myHero) * 0.6
+	local rDmg = 100 + GetCastLevel(myHero,_R) * 150 + GetBonusAP(myHero) * 0.6
 	-- info = "R dmg : "..rDmg .. "\n"
 	info = ""
 	for nID, enemy in pairs(GetEnemyHeroes()) do

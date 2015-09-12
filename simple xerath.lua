@@ -1,21 +1,25 @@
-if GetObjectName(GetMyHero()) ~= "Xerath" then return end
+local myHero = GetMyHero()
+if GetObjectName(myHero) ~= "Xerath" then return end
 -- known issue:
 -- dead buff(kog, karthus) cause get target fail
 -- recall cause pred fail(way point bug? only happen with AI)
 
-require 'Inspired'
+d = require 'DLib'
+local IsInDistance = d.IsInDistance
+local ValidTarget = d.ValidTarget
+local CalcDamage = d.CalcDamage
+local GetTarget = d.GetTarget
+local GetEnemyHeroes = d.GetEnemyHeroes
+local GetDistance = d.GetDistance
 require 'Interrupter'
 
 local debug = false
 local DrawDebugText = DrawText
 if not debug then DrawDebugText = function ( ... ) end end
 local castname = "nope"
-local myHero = GetMyHero()
 
 local semiAuto = false
 local semiAutoDelay = 0
-
-
 
 local qTime = 0
 local qRange = 0
@@ -49,10 +53,9 @@ local function castQ( target )
     end
 
     -- release castQ
-    local myHeroPos = GetMyHeroPos()
     if IsInDistance(target, qRange) then 
     	-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
-    	local pred = GetPredictionForPlayer(myHeroPos,target,GetMoveSpeed(target),math.huge,500,qRange,200,false,true)
+    	local pred = GetPredictionForPlayer(GetOrigin(myHero),target,GetMoveSpeed(target),math.huge,500,qRange,200,false,true)
     	if pred.HitChance == 1 then 
     		CastSkillShot2(_Q,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
     		-- PrintChat("qRange "..qRange)
@@ -72,10 +75,9 @@ local function castW( target )
 end
 
 local function castE( target )	
-	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then	
-		local myHeroPos = GetMyHeroPos()
+	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then
 		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
-		local pred = GetPredictionForPlayer(myHeroPos,target,GetMoveSpeed(target),1600,250,GetCastRange(myHero,_E),70,true,true)
+		local pred = GetPredictionForPlayer(GetOrigin(myHero),target,GetMoveSpeed(target),1600,250,GetCastRange(myHero,_E),70,true,true)
 		-- DrawDebugText("cast E: "..pred.HitChance,20,0,135,0xff00ff00)
 		if pred.HitChance == 1 then
 			CastSkillShot(_E,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
@@ -128,10 +130,9 @@ local function castR( target )
 		if rChangeTargetDelay and rChangeTargetDelay > GetTickCount() then return end
 	end
 
-	local myHeroPos = GetMyHeroPos()
 	if IsInDistance(rTarget, rRange) then
 		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
-		local pred = GetPredictionForPlayer(myHeroPos,rTarget,GetMoveSpeed(rTarget),math.huge,600,rRange,170,false,true);
+		local pred = GetPredictionForPlayer(GetOrigin(myHero),rTarget,GetMoveSpeed(rTarget),math.huge,600,rRange,170,false,true);
 	 	if pred.HitChance == 1 then
 			CastSkillShot(_R,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
 			rDelay = GetTickCount() + 800
@@ -206,7 +207,7 @@ OnProcessSpell(function(unit,spell)
 	end
 end)
 
-addInterrupterCallback(function(target, spellType)
+addInterrupterCallback(function(target, spellType, spell)
 	castE(target)
 end)
 
