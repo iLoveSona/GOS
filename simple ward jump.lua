@@ -3,12 +3,22 @@
 
 local spellList = { LeeSin = _W, Katarina = _E, Jax = _Q }
 local myHero = GetMyHero()
-local spellSlot = spellList[ GetObjectName(myHero) ]
+local name = GetObjectName(myHero)
+local spellSlot = spellList[ name ]
 
 -- only 3 champion can do ward jump now
 if not spellSlot then return end
 
 require 'MapPositionGOS'
+local d = require 'DLib'
+local GetEnemyHeroes = d.GetEnemyHeroes
+local GetAllyHeroes = d.GetAllyHeroes
+
+local submenu = menu.addItem(SubMenu.new("simple ward jump for "..name))
+local key = submenu.addItem(MenuKeyBind.new("ward jump key", string.byte("Z")))
+local detectWall = submenu.addItem(MenuBool.new("detect wall", true))
+local debugmode = submenu.addItem(MenuBool.new("debug mode", false))
+
 
 -- local everything as much as possible for fps(not really work)
 local GetOrigin = GetOrigin
@@ -16,7 +26,24 @@ local GetObjectName = GetObjectName
 local GetObjectType = GetObjectType
 
 local wardRange = 600
-local debug = false
+-- local debug = false
+local debug = debugmode.getValue()
+
+-- copy from perfect ward
+local wardItems = {
+	{ id = 3340, name = "TrinketTotemLvl1"},
+	{ id = 3350, name = "TrinketTotemLvl2"},
+	{ id = 3361, name = "TrinketTotemLvl3"},
+	{ id = 3362, name = "TrinketTotemLvl3B"},
+	-- { id = 3154, name = "wrigglelantern"},
+	-- { id = 3160, name = "FeralFlare"},
+	{ id = 2045, name = "ItemGhostWard"},
+	{ id = 2049, name = "ItemGhostWard"},
+	{ id = 2050, name = "ItemMiniWard"},
+	{ id = 2044, name = "sightward"},
+	{ id = 2043, name = "VisionWard"}
+}
+
 local jumpTarget
 local wardLock
 local mousePos
@@ -24,21 +51,6 @@ local wardpos
 local maxPos 
 local spellObj
 local objectList = {}
-
--- copy from perfect ward
-local wardItems = {        
-        { id = 3340, spellName = "TrinketTotemLvl1"},
-        { id = 3350, spellName = "TrinketTotemLvl2"},
-        { id = 3361, spellName = "TrinketTotemLvl3"},
-        { id = 3362, spellName = "TrinketTotemLvl3B"},
-        -- { id = 3154, spellName = "wrigglelantern"},
-        -- { id = 3160, spellName = "FeralFlare"},
-        { id = 2045, spellName = "ItemGhostWard"},
-        { id = 2049, spellName = "ItemGhostWard"},
-        { id = 2050, spellName = "ItemMiniWard"},
-        { id = 2044, spellName = "sightward"},
-        { id = 2043, spellName = "VisionWard"}
-}
 
 -- modified from Inspired.lua
 local function GetDistanceSqr(p1,p2)
@@ -75,24 +87,39 @@ local function validTarget( object )
 	local objType = GetObjectType(object)
 	
 	-- need check type == ward, but rito set everything is minion lol	
-	if GetObjectName(myHero) == "LeeSin" then
+	return (objType == Obj_AI_Hero or objType == Obj_AI_Minion) and IsVisible(object) and IsTargetable(object)
+end
+
+-- local function validTargetLee( object )
+-- 	local objType = GetObjectType(object)
+	
+-- 	-- need check type == ward, but rito set everything is minion lol	
+-- 	-- poor lee cannot jump to enemy
+-- 	return (objType == Obj_AI_Hero or objType == Obj_AI_Minion) and IsVisible(object) and IsTargetable(object) and GetTeam(object) == GetTeam(myHero)
+-- end
+
+if name == "LeeSin" then 
+	validTarget = function ( object )
+		local objType = GetObjectType(object)
+	
+		-- need check type == ward, but rito set everything is minion lol	
 		-- poor lee cannot jump to enemy
-		return (objType == Obj_AI_Hero or objType == Obj_AI_Minion) and IsVisible(object) and GetTeam(object) == GetTeam(myHero)
-	else		
-		return (objType == Obj_AI_Hero or objType == Obj_AI_Minion) and IsVisible(object)
+		return (objType == Obj_AI_Hero or objType == Obj_AI_Minion) and IsVisible(object) and IsTargetable(object) and GetTeam(object) == GetTeam(myHero)
 	end
 end
 
-local findWardSlot = function ()
-	local slot = 0
+local function findWardSlot()
+	local slot = nil
 	for i,wardItem in pairs(wardItems) do
 		slot = GetItemSlot(myHero,wardItem.id)
 		if slot > 0 and CanUseSpell(myHero, slot) == READY then return slot end
 	end
+	return nil
 end
 
 local function putWard(pos0)	
 	local slot = findWardSlot()
+	if not slot then return end
 
 	local pos = pos0
 	if not IsInDistance(wardRange, pos) then
@@ -100,15 +127,17 @@ local function putWard(pos0)
 	end
 	
 	-- don't put ward in wall, or it might jump fail like noob
-	if MapPosition:inWall(pos) then return end
-
-	if slot and slot > 0 then
-		if debug then DrawText("slot : "..slot,20,0,50,0xffffff00) end
-		CastSkillShot(slot,pos.x,pos.y,pos.z)
+	if detectWall.getValue() then
+		if MapPosition:inWall(pos) then return false end
 	end
+
+	if debug then DrawText("slot : "..slot,20,0,50,0xffffff00) end
+	
+	CastSkillShot(slot,pos.x,pos.y,pos.z)
+	return true
 end
 
-local drawDebugInfo = function ()
+local function drawDebugInfo()
 	DrawCircle(mousePos.x,mousePos.y,mousePos.z,200,0,0,0xff00ff00);
 	if wardpos then
 		DrawCircle(wardpos.x,wardpos.y,wardpos.z,200,0,0,0xffffff00);
@@ -131,16 +160,55 @@ end
 
 local spellLock = nil
 
+local function canWardJump()
+	return not spellLock and CanUseSpell(myHero, spellSlot) == READY
+end
+
+if name == "LeeSin" then 
+	canWardJump = function ()
+		return not spellLock and CanUseSpell(myHero, spellSlot) == READY and GetCastName(myHero, spellSlot) ~= "blindmonkwtwo"
+	end
+end
+
 function wardJump( pos )
-	if not spellLock and CanUseSpell(myHero, spellSlot) == READY and GetCastName(myHero, spellSlot) ~= "blindmonkwtwo" then
+	if canWardJump() then
 		if jumpTarget then
 			CastTargetSpell(jumpTarget, spellSlot)
 			if debug then PrintChat(GetCastName(myHero, spellSlot).." GetTickCount "..GetTickCount()) end
 			spellLock = GetTickCount()
 		elseif not wardLock then
-			wardLock = GetTickCount()
-			putWard(pos)
+			if putWard(pos) then wardLock = GetTickCount() end
 		end
+	end
+end
+
+local function findTargetInList(list, pos)
+	for _,object in pairs(list) do
+	  if validTarget(object) and IsInDistance(200, GetOrigin(object), pos) then
+	   	return object
+	  end
+	end
+	return nil
+end
+
+local function GetJumpTargetHero(pos)
+	local result = findTargetInList(GetEnemyHeroes(), pos)
+	if result then return result end
+
+	-- result = findTargetInList(GetAllyHeroes())
+	-- if result then return result end
+	-- return nil
+
+	return findTargetInList(GetAllyHeroes(), pos)
+end
+
+if name == "LeeSin" then
+	GetJumpTargetHero = function (pos)
+		-- local result = findTargetInList(GetAllyHeroes(), pos)
+		-- if result then return result end
+		-- return nil
+
+		return findTargetInList(GetAllyHeroes(), pos)
 	end
 end
 
@@ -149,12 +217,18 @@ local function GetJumpTarget()
 	if not IsInDistance(wardRange, mousePos, GetOrigin(myHero)) then
 		pos = maxPos
 	end
-	for _,object in pairs(objectList) do
-	  if validTarget(object) and IsInDistance(200, GetOrigin(object), pos) then
-	   	return object
-	  end
-	end
-	return nil
+
+	-- search hero
+	local result = GetJumpTargetHero(pos)
+	if result then return result end
+
+	-- search minion
+	-- result = findTargetInList(objectList, pos)
+	-- if result then return result end
+
+	-- return nil
+
+	return findTargetInList(objectList, pos)
 end
 
 OnLoop(function(myHero)
@@ -166,13 +240,13 @@ OnLoop(function(myHero)
 	if debug then	drawDebugInfo()	end	
 
 	-- check spell name not lee W2
-	if not spellLock and wardLock and jumpTarget and CanUseSpell(myHero, spellSlot) == READY and GetCastName(myHero, spellSlot) ~= "blindmonkwtwo" then
+	if canWardJump() and jumpTarget and wardLock then
 		CastTargetSpell(jumpTarget, spellSlot)
 		if debug then PrintChat(GetCastName(myHero, spellSlot).." wardLock "..wardLock) end
 		spellLock = GetTickCount()
 	end
 
-	if KeyIsDown(string.byte("Z")) then
+	if key.getValue() then
 		wardJump(mousePos)
 	end
 
@@ -214,6 +288,8 @@ OnObjectLoop(function(object,myHero)
 end)
 
 OnProcessSpell(function(unit,spell)
+	if not debug then return end
+
 	-- TODO check spell == ward instead just check not hero spell
 	if unit and unit == myHero and spell and not spell.name:lower():find("katarina") and not spell.name:lower():find("leesin") and not spell.name:lower():find("jax") then
 		spellObj = spell
@@ -244,4 +320,4 @@ OnDeleteObj(function(Object)
 	end
 end)
 
-PrintChat("simple ward jump loaded")
+PrintChat("simple ward jump for "..name.." loaded")

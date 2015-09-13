@@ -2,7 +2,7 @@ if GetObjectName(GetMyHero()) ~= "Katarina" then return end
 
 require("Inspired")
 require("IAC")
-require("simpleWardJump")
+require("simple ward jump")
 
 myIAC = IAC()
 
