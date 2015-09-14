@@ -7,6 +7,10 @@ d = require 'DLib'
 local IsInDistance = d.IsInDistance
 local ValidTarget = d.ValidTarget
 
+local submenu = menu.addItem(SubMenu.new("simple vayne"))
+local key = submenu.addItem(MenuKeyBind.new("auto stun key", string.byte(" ")))
+local autoStun = submenu.addItem(MenuBool.new("auto stun when possible", true))
+
 -- modify from IAC vayne
 local function AutoEiAC()
 	local target = GetCurrentTarget()
@@ -23,13 +27,16 @@ local function AutoEiAC()
 end
 
 addInterrupterCallback(function(target, spellType, spell)
+	PrintChat(spell.name.." "..GetObjectName(target))
 	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then
 		CastTargetSpell(target, _E)
 	end
 end)
 
 OnLoop(function(myHero)
-	AutoEiAC()
+	if key.getValue() or autoStun.getValue() then
+		AutoEiAC()
+	end
 end)
 
 PrintChat("simple vayne loaded")

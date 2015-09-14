@@ -80,8 +80,39 @@ GAPCLOSER_SPELLS = {
     ["Ziggs"]                       = {_W},
 }
 
+local spellText = { "Q", "W", "E", "R" }
+
 local callback = nil
 local myTeam = GetTeam(GetMyHero())
+
+local d = require 'DLib'
+local GetEnemyHeroes = d.GetEnemyHeroes
+local CHANELLING_SPELLS_enemy = {}
+local GAPCLOSER_SPELLS_enemy = {}
+local submenu = menu.addItem(SubMenu.new("interrupter"))
+-- local autoStun = submenu.addItem(MenuBool.new("auto stun when possible", true))
+
+local submenuGapClose = submenu.addItem(SubMenu.new("gap close spell"))
+local submenuChannell = submenu.addItem(SubMenu.new("chanelling spell"))
+delay(function()
+    for _,enemy in pairs(GetEnemyHeroes()) do
+        local name = GetObjectName(enemy)
+        
+        local list = GAPCLOSER_SPELLS[name]
+        if list then
+            for _, spellSlot in pairs(list) do
+                GAPCLOSER_SPELLS_enemy[name..spellSlot] = submenuGapClose.addItem(MenuBool.new(name.." "..spellText[spellSlot+1], true))
+            end
+        end
+        list = CHANELLING_SPELLS[name]
+        if list then
+            for _, spellSlot in pairs(list) do
+                CHANELLING_SPELLS_enemy[name..spellSlot] = submenuChannell.addItem(MenuBool.new(name.." "..spellText[spellSlot+1], true))
+            end
+        end
+        PrintChat(name)
+    end
+end, 3000)
 
 OnProcessSpell(function(unit, spell)    
     if not callback or not unit or GetObjectType(unit) ~= Obj_AI_Hero  or GetTeam(unit) == myTeam then return end
@@ -93,11 +124,11 @@ OnProcessSpell(function(unit, spell)
     if unitChanellingSpells then
         for _, spellSlot in pairs(unitChanellingSpells) do
             -- PrintChat(spell.name.." "..GetCastName(unit, spellSlot))
-            if spellName == GetCastName(unit, spellSlot) then callback(unit, CHANELLING_SPELLS, spell) end
+            if spellName == GetCastName(unit, spellSlot) and CHANELLING_SPELLS_enemy[unitName..spellSlot].getValue() then callback(unit, CHANELLING_SPELLS, spell) end
         end
     elseif unitGapcloserSpells then
         for _, spellSlot in pairs(unitGapcloserSpells) do
-            if spellName == GetCastName(unit, spellSlot) then callback(unit, GAPCLOSER_SPELLS, spell) end
+            if spellName == GetCastName(unit, spellSlot) and GAPCLOSER_SPELLS_enemy[unitName..spellSlot].getValue() then callback(unit, GAPCLOSER_SPELLS, spell) end
         end
     end
 end)
