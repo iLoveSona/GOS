@@ -2388,6 +2388,7 @@ local objManager = {
 	allyHeroes = {},
 }
 
+-- you need use callback by initCallback when you want use this api in load time
 function ilib.GetEnemyHeroes()
 	return objManager.enemyHeroes
 end
@@ -2410,17 +2411,24 @@ function ilib.GetTarget(range, damageType)
 	return target
 end
 
-function ilib.init()
-	-- OnLoop(function()
-	-- 	for _,object in pairs(objManager.uncheck) do
-	-- 		local objType = GetObjectType(object)
-	-- 		local objTeam = GetTeam(object)
+local callback = nil
+function ilib.initCallback(callback0)
+	callback = callback0
+end
 
-	-- 		if objType == Obj_AI_Hero and objTeam ~= myTeam then
-	-- 			objManager.enemyHeroes[object] = object
-	-- 			objManager.uncheck[object] = nil
-	-- 		end
-	-- 	end
+function ilib.init()
+	-- local done = false
+	-- OnLoop(function()
+		-- for _,object in pairs(objManager.uncheck) do
+		-- 	local objType = GetObjectType(object)
+		-- 	local objTeam = GetTeam(object)
+
+		-- 	if objType == Obj_AI_Hero and objTeam ~= myTeam then
+		-- 		objManager.enemyHeroes[object] = object
+		-- 		objManager.uncheck[object] = nil
+		-- 	end
+		-- end
+	-- 	done = true
 	-- end)
 
 	-- OnCreateObj(function(object)
@@ -2436,22 +2444,26 @@ function ilib.init()
 	-- end)
 
 	local initHeroCounter = 0
+	local print = print
 	OnObjectLoop(function(object,myHero)
-		-- if initHeroCounter >= 9 then return end
+		if initHeroCounter >= 9 then return end
+		-- if done then return end
 
 		if GetObjectType(object) == Obj_AI_Hero then
 			local slot = GetNetworkID(object)
 			
 			-- if objManager.allyHeroes[slot] or objManager.enemyHeroes[slot] then return end
 
-			if GetTeam(object) == myTeam then
+			if GetTeam(object) == GetTeam(myHero) then
 				objManager.allyHeroes[slot] = object
-				-- PrintChat("allyHeroes : "..GetObjectName(object))
+				-- print(initHeroCounter.." allyHeroes : "..GetObjectName(object))
 			else
 				objManager.enemyHeroes[slot] = object
-				-- PrintChat("enemyHeroes : "..GetObjectName(object))
+				-- print(initHeroCounter.." enemyHeroes : "..GetObjectName(object))
 			end
 			initHeroCounter = initHeroCounter + 1
+			-- print(initHeroCounter)
+			if initHeroCounter >= 9 then callback(true) end
 		end
 	end)
 end

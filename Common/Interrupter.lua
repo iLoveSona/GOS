@@ -46,9 +46,8 @@ GAPCLOSER_SPELLS = {
     ["Kennen"]                      = {_E},
     ["KhaZix"]                      = {_E},
     ["Lissandra"]                   = {_E},
-    ["LeBlanc"]                     = {_W},
-    -- ["LeBlanc"]                     = {_R},
-    ["LeeSin"]                      = {_Q},
+    ["LeBlanc"]                     = {_W, _R},
+    ["LeeSin"]                      = {_Q, _W},
     ["Leona"]                       = {_E},
     ["Lucian"]                      = {_E},
     ["Malphite"]                    = {_R},
@@ -90,32 +89,37 @@ local GetEnemyHeroes = d.GetEnemyHeroes
 local CHANELLING_SPELLS_enemy = {}
 local GAPCLOSER_SPELLS_enemy = {}
 local submenu = menu.addItem(SubMenu.new("interrupter"))
--- local autoStun = submenu.addItem(MenuBool.new("auto stun when possible", true))
 
 local submenuGapClose = submenu.addItem(SubMenu.new("gap close spell"))
 local submenuChannell = submenu.addItem(SubMenu.new("chanelling spell"))
-delay(function()
-    for _,enemy in pairs(GetEnemyHeroes()) do
-        local name = GetObjectName(enemy)
-        
-        local list = GAPCLOSER_SPELLS[name]
-        if list then
-            for _, spellSlot in pairs(list) do
-                GAPCLOSER_SPELLS_enemy[name..spellSlot] = submenuGapClose.addItem(MenuBool.new(name.." "..spellText[spellSlot+1], true))
+
+local loaded = false
+d.initCallback(function(result)
+    if result then
+        for _,enemy in pairs(GetEnemyHeroes()) do
+            local name = GetObjectName(enemy)
+            
+            local list = GAPCLOSER_SPELLS[name]
+            if list then
+                for _, spellSlot in pairs(list) do
+                    GAPCLOSER_SPELLS_enemy[name..spellSlot] = submenuGapClose.addItem(MenuBool.new(name.." "..spellText[spellSlot+1], true))
+                end
             end
-        end
-        list = CHANELLING_SPELLS[name]
-        if list then
-            for _, spellSlot in pairs(list) do
-                CHANELLING_SPELLS_enemy[name..spellSlot] = submenuChannell.addItem(MenuBool.new(name.." "..spellText[spellSlot+1], true))
+            list = CHANELLING_SPELLS[name]
+            if list then
+                for _, spellSlot in pairs(list) do
+                    CHANELLING_SPELLS_enemy[name..spellSlot] = submenuChannell.addItem(MenuBool.new(name.." "..spellText[spellSlot+1], true))
+                end
             end
+            -- PrintChat(name)
         end
-        PrintChat(name)
+        loaded = true
+        PrintChat("[interrupter] : loaded")
     end
-end, 3000)
+end)
 
 OnProcessSpell(function(unit, spell)    
-    if not callback or not unit or GetObjectType(unit) ~= Obj_AI_Hero  or GetTeam(unit) == myTeam then return end
+    if not loaded and not callback or not unit or GetObjectType(unit) ~= Obj_AI_Hero  or GetTeam(unit) == myTeam then return end
     local unitName = GetObjectName(unit)
     local unitChanellingSpells = CHANELLING_SPELLS[unitName]
     local unitGapcloserSpells = GAPCLOSER_SPELLS[unitName]
@@ -136,3 +140,5 @@ end)
 function addInterrupterCallback( callback0 )
 	callback = callback0
 end
+
+PrintChat("[interrupter] : loading...")
