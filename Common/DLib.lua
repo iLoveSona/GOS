@@ -1,4 +1,4 @@
-local version = 21
+local version = 22
 
 local require2 = _G.require
 
@@ -2463,7 +2463,7 @@ function ilib.init()
 			end
 			initHeroCounter = initHeroCounter + 1
 			-- print(initHeroCounter)
-			if initHeroCounter >= 9 then callback(true) end
+			if initHeroCounter >= 9 and callback then callback(true) end
 		end
 	end)
 end
