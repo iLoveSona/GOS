@@ -1,4 +1,4 @@
-local version = 22
+local version = 23
 
 local require2 = _G.require
 
@@ -2363,7 +2363,7 @@ end
 
 function ilib.ValidTarget(unit, range)
     range = range or 25000
-    if not unit or not GetOrigin(unit) or not IsTargetable(unit) or IsImmune(unit) or IsDead(unit) or not IsVisible(unit) or GetTeam(unit) == myTeam or not ilib.IsInDistance(unit, range) then return false end
+    if not unit or not GetOrigin(unit) or not IsTargetable(unit) or IsImmune(unit, myHero) or IsDead(unit) or not IsVisible(unit) or GetTeam(unit) == myTeam or not ilib.IsInDistance(unit, range) then return false end
     return true
 end
 
