@@ -18,6 +18,16 @@ local DrawDebugText = DrawText
 if not debug then DrawDebugText = function ( ... ) end end
 local castname = "nope"
 
+local submenu = menu.addItem(SubMenu.new("simple xerath"))
+local ultHumanized = submenu.addItem(MenuBool.new("ult humanized", true))
+local comboKey = submenu.addItem(MenuKeyBind.new("Combo Key", string.byte(" ")))
+local comboSpellOrder = submenu.addItem(SubMenu.new("Combo spell order"))
+local comboSpellOrderList = {
+	comboSpellOrder.addItem(MenuStringList.new("1st", {"Q", "W", "E"}, 1)),
+	comboSpellOrder.addItem(MenuStringList.new("2ed", {"Q", "W", "E"}, 2)),
+	comboSpellOrder.addItem(MenuStringList.new("3rd", {"Q", "W", "E"}, 3)),
+}
+
 local semiAuto = false
 local semiAutoDelay = 0
 
@@ -41,8 +51,10 @@ local function checkQ()
   DrawDebugText("Q range "..qRange,20,200,100,0xff00ff00)
 end
 
-local function castQ( target )
-	
+local function castQ(target0)
+	local target = target0 or GetTarget(1500, DAMAGE_MAGIC)
+	if not target then return end
+	DrawDebugText("Q target: "..GetObjectName(target),20,200,200,0xff00ff00)
 	if IsInDistance(target, 1500) and CanUseSpell(myHero,_Q) == READY then	
 		
 		-- start castQ
@@ -64,7 +76,9 @@ local function castQ( target )
 	end
 end
 
-local function castW( target )	
+local function castW(target0)
+	local target = target0 or GetTarget(GetCastRange(myHero, _W), DAMAGE_MAGIC)
+	if not target then return end
 	if IsInDistance(target, GetCastRange(myHero,_W)) and CanUseSpell(myHero,_W) == READY then	
 		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
 		local pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),math.huge,500,GetCastRange(myHero,_W),150,false,true)
@@ -74,7 +88,9 @@ local function castW( target )
 	end
 end
 
-local function castE( target )	
+local function castE(target0)	
+	local target = target0 or GetTarget(GetCastRange(myHero, _E), DAMAGE_MAGIC)
+	if not target then return end
 	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then
 		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
 		local pred = GetPredictionForPlayer(GetOrigin(myHero),target,GetMoveSpeed(target),1600,250,GetCastRange(myHero,_E),70,true,true)
@@ -123,7 +139,7 @@ local function castR( target )
 	end
 
 	local danger = IsInDistance(target, 700)
-	if not danger then
+	if ultHumanized.getValue() and not danger then
 		-- if rDelay then PrintChat("rDelay "..rDelay- GetTickCount()) end
 		-- if rChangeTargetDelay then PrintChat("rChangeTargetDelay "..rChangeTargetDelay- GetTickCount()) end
 		if rDelay and rDelay > GetTickCount() then return end
@@ -164,6 +180,10 @@ local function killableInfo()
   DrawText(info,40,500,0,0xffff0000) 
 end
 
+local castSpellList = {
+	castQ, castW, castE
+}
+
 OnLoop(function(myHero)
 
 	DrawDebugText("Q range "..GetCastRange(myHero,_Q),20,200,30,0xff00ff00)
@@ -184,20 +204,20 @@ OnLoop(function(myHero)
 	end
 
 
+	checkQ()
+	if comboKey.getValue() then
+		castSpellList[comboSpellOrderList[1].getValue()]()
+		castSpellList[comboSpellOrderList[2].getValue()]()
+		castSpellList[comboSpellOrderList[3].getValue()]()
+	end
+
 	local target = GetCurrentTarget()
 	if ValidTarget(target) then
 		if GetObjectName(target) then
 			DrawDebugText("target "..GetObjectName(target),20,0,100,0xff00ff00)
 		end
 	
-		castR(target)
-
-		checkQ()
-		if KeyIsDown(32) then	
-			castQ(target)
-			castW(target)
-			castE(target)
-		end
+		castR(target)		
 	end
 end)
 
