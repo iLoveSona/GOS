@@ -1,11 +1,20 @@
 if GetObjectName(GetMyHero()) ~= "Katarina" then return end
 
-require("Inspired")
+local d = require("DLib")
+-- require("Inspired")
 require("IAC")
 require("simple ward jump")
 
 myIAC = IAC()
 
+local IsInDistance = d.IsInDistance
+local ValidTarget = d.ValidTarget
+local CalcDamage = d.CalcDamage
+local GetTarget = d.GetTarget
+local GetEnemyHeroes = d.GetEnemyHeroes
+local GetDistance = d.GetDistance
+
+local wardRange = 600
 OnLoop(function(myHero)
 	local target = GetCurrentTarget()
 
