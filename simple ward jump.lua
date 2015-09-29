@@ -213,6 +213,8 @@ if name == "LeeSin" then
 end
 
 local function GetJumpTarget()
+	if wardLock then return findTargetInList(objectList, wardpos) end
+
 	local pos = mousePos
 	if not IsInDistance(wardRange, mousePos, GetOrigin(myHero)) then
 		pos = maxPos
@@ -288,7 +290,7 @@ OnObjectLoop(function(object,myHero)
 end)
 
 OnProcessSpell(function(unit,spell)
-	if not debug then return end
+	-- if not debug then return end
 
 	-- TODO check spell == ward instead just check not hero spell
 	if unit and unit == myHero and spell and not spell.name:lower():find("katarina") and not spell.name:lower():find("leesin") and not spell.name:lower():find("jax") then
@@ -313,7 +315,7 @@ OnCreateObj(function(object)
 	end
 end)
 
-OnDeleteObj(function(Object)
+OnDeleteObj(function(object)
 	local objType = GetObjectType(object)
 	if objType == Obj_AI_Hero or objType == Obj_AI_Minion then
 		objectList[object] = nil
