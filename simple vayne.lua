@@ -39,4 +39,15 @@ OnLoop(function(myHero)
 	end
 end)
 
+OnProcessSpell(function(unit, spell)    
+  if unit == myHero and spell.name:lower():find("attack") and KeyIsDown(32) then
+   	delay(function()
+   		if CanUseSpell(myHero,_Q) == READY then
+   			local mousePos = GetMousePos()
+				CastSkillShot(_Q, mousePos.x, mousePos.y, mousePos.z)
+   		end
+   	end, GetWindUp(myHero)*1000)
+  end
+end)
+
 PrintChat("simple vayne loaded")

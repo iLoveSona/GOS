@@ -3,6 +3,10 @@
 local myHero = GetMyHero()
 local name = GetObjectName(myHero)
 
+d = require 'DLib'
+local CalcDamage = d.CalcDamage
+local GetDistance = d.GetDistance
+
 local spellData = {
 	["Ashe"] = {
 		delay = 250,
@@ -31,8 +35,6 @@ local spellData = {
 local mySpellData = spellData[name]
 if not mySpellData then return end
 
-require("Inspired")
-
 local basePos = {
 	[100] = Vector(14340, 171, 14390),
 	[200] = Vector(400, 200, 400)
@@ -40,7 +42,7 @@ local basePos = {
 
 local team = GetTeam(myHero)
 local enemyBasePos = basePos[team]
-local delay = mySpellData.delay
+local spellDelay = mySpellData.delay
 local missileSpeed = mySpellData.missileSpeed
 local damage = mySpellData.damage
 
@@ -57,10 +59,10 @@ OnProcessRecall(function(Object,recallProc)
 	if GetTeam(Object) ~= team and CanUseSpell(myHero, _R) == READY and damage(Object) > GetCurrentHP(Object) then
 		-- target = Object
 		local timeToRecall = recallProc.totalTime
-		local timeToHit = delay + (GetDistance(enemyBasePos) * 1000 / missileSpeed)
+		local timeToHit = spellDelay + (GetDistance(enemyBasePos) * 1000 / missileSpeed)
 		if timeToRecall > timeToHit then
 			recallPos = Vector(Object)				
-			DelayAction(
+			delay(
 				function() 
 					if recallPos == Vector(Object) then
 						CastSkillShot(_R, enemyBasePos.x, enemyBasePos.y, enemyBasePos.z)
