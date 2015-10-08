@@ -19,14 +19,24 @@ if not debug then DrawDebugText = function ( ... ) end end
 local castname = "nope"
 
 local submenu = menu.addItem(SubMenu.new("simple xerath"))
-local ultHumanized = submenu.addItem(MenuBool.new("ult humanized", true))
-local comboKey = submenu.addItem(MenuKeyBind.new("Combo Key", string.byte(" ")))
-local comboSpellOrder = submenu.addItem(SubMenu.new("Combo spell order"))
+
+local comboMenu = submenu.addItem(SubMenu.new("combo settings"))
+local comboKey = comboMenu.addItem(MenuKeyBind.new("Combo Key", string.byte(" ")))
+local comboSpellOrder = comboMenu.addItem(SubMenu.new("Combo spell order"))
 local comboSpellOrderList = {
 	comboSpellOrder.addItem(MenuStringList.new("1st", {"Q", "W", "E"}, 1)),
 	comboSpellOrder.addItem(MenuStringList.new("2ed", {"Q", "W", "E"}, 2)),
 	comboSpellOrder.addItem(MenuStringList.new("3rd", {"Q", "W", "E"}, 3)),
 }
+
+local ultMenu = submenu.addItem(SubMenu.new("ult settings"))
+local ultHumanized = ultMenu.addItem(MenuBool.new("ult humanized", true))
+local semiUltMode = ultMenu.addItem(MenuBool.new("[semi auto] ult mode(always ON)", false))
+local semiUltModeKey = ultMenu.addItem(MenuKeyBind.new("[semi auto] ult mode Key(ON/OFF temporally)", 17))
+local ultSearchRange = ultMenu.addItem(MenuSlider.new("[semi auto] ult search range(default 800)", 800, 0, 1500, 100))
+local ultMode = ultMenu.addItem(MenuStringList.new("ult mode", {"auto", "manual"}, 1))
+local ultDelay = ultMenu.addItem(MenuSlider.new("[auto/semi auto] ult delay(default 800)", 800, 0, 2000, 100))
+local ultKey = ultMenu.addItem(MenuKeyBind.new("[manual] ult Key", string.byte("T")))
 
 local semiAuto = false
 local semiAutoDelay = 0
@@ -121,16 +131,12 @@ local function castR( target )
 			rChangeTargetDelay = GetTickCount() + range / 2
 		end
 	end
+
+	-- target not found
 	if not rTarget then return end	
-	if semiAuto and GetDistance(GetMousePos(), GetOrigin(rTarget)) > 800 then 
-		rTarget = nil
-		rDelay = nil
-		rChangeTargetDelay = nil
-		return 
-	end
 
+	-- not casting ult
 	DrawDebugText("R target : "..GetObjectName(rTarget),20,0,120,0xff00ff00)
-
 	if GotBuff(myHero,"XerathLocusOfPower2") == 0 then 
 		rTarget = nil
 		rDelay = nil
@@ -138,12 +144,27 @@ local function castR( target )
 		return 
 	end
 
+	-- draw semi auto search circle
+	if semiUltMode.getValue() or semiAuto then
+		local mousePos = GetMousePos()
+		DrawCircle(mousePos.x,mousePos.y,mousePos.z,ultSearchRange.getValue(),0,0,0xff0000ff)
+	end
+
+	if (semiAuto or semiUltMode.getValue()) and GetDistance(GetMousePos(), GetOrigin(rTarget)) > ultSearchRange.getValue() then 
+		rTarget = nil
+		rDelay = nil
+		rChangeTargetDelay = nil
+		return 
+	end
+
 	local danger = IsInDistance(target, 700)
-	if ultHumanized.getValue() and not danger then
+	local ultModeType = ultMode.getValue()
+	if ultModeType == 1 and ultHumanized.getValue() and not danger then
 		-- if rDelay then PrintChat("rDelay "..rDelay- GetTickCount()) end
 		-- if rChangeTargetDelay then PrintChat("rChangeTargetDelay "..rChangeTargetDelay- GetTickCount()) end
 		if rDelay and rDelay > GetTickCount() then return end
 		if rChangeTargetDelay and rChangeTargetDelay > GetTickCount() then return end
+	elseif ultModeType == 2 and not ultKey.getValue() then return
 	end
 
 	if IsInDistance(rTarget, rRange) then
@@ -151,7 +172,7 @@ local function castR( target )
 		local pred = GetPredictionForPlayer(GetOrigin(myHero),rTarget,GetMoveSpeed(rTarget),math.huge,600,rRange,170,false,true);
 	 	if pred.HitChance == 1 then
 			CastSkillShot(_R,pred.PredPos.x,pred.PredPos.y,pred.PredPos.z)
-			rDelay = GetTickCount() + 800
+			rDelay = GetTickCount() + ultDelay.getValue()
 			-- PrintChat(rRange.."  "..GetObjectName(rTarget))
 		end
 	end
@@ -185,7 +206,6 @@ local castSpellList = {
 }
 
 OnLoop(function(myHero)
-
 	DrawDebugText("Q range "..GetCastRange(myHero,_Q),20,200,30,0xff00ff00)
 	DrawDebugText("R range "..GetCastRange(myHero,_R),20,0,30,0xff00ff00)
 	DrawDebugText("buff XerathArcanopulseChargeUp: "..GotBuff(myHero,"XerathArcanopulseChargeUp"),20,0,150,0xff00ff00)
@@ -195,7 +215,7 @@ OnLoop(function(myHero)
 	killableInfo()
 
 	-- TODO: rework this toggle feature with new api(hope we have)
-	if KeyIsDown(17) and semiAutoDelay < GetTickCount() then
+	if semiUltModeKey.getValue() and semiAutoDelay < GetTickCount() then
 		semiAuto = not semiAuto
 		semiAutoDelay = GetTickCount() + 500
 	end
@@ -217,7 +237,7 @@ OnLoop(function(myHero)
 			DrawDebugText("target "..GetObjectName(target),20,0,100,0xff00ff00)
 		end
 	
-		castR(target)		
+		castR(target)
 	end
 end)
 
