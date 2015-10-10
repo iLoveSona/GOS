@@ -11,7 +11,7 @@ OnLoop(function(myHero)
 
 		if CanUseSpell(myHero,_Q) == READY and IsInDistance(target, GetCastRange(myHero,_Q))then
 			-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
-			local pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),2000,250,GetCastRange(myHero,_Q),60,true,true)
+			local pred = GetPredictionForPlayer(GetOrigin(myHero),target,GetMoveSpeed(target),2000,250,GetCastRange(myHero,_Q),60,true,true)
 			if pred.HitChance == 1 then
 				CastSkillShot(_Q, pred.PredPos.x, pred.PredPos.y, pred.PredPos.z)
 			end
@@ -19,7 +19,7 @@ OnLoop(function(myHero)
 
 		if CanUseSpell(myHero,_W) == READY and IsInDistance(target, GetCastRange(myHero,_W))then
 			-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
-			local pred = GetPredictionForPlayer(GetOrigin(target),target,GetMoveSpeed(target),1600,250,GetCastRange(myHero,_W),80,false,true)
+			local pred = GetPredictionForPlayer(GetOrigin(myHero),target,GetMoveSpeed(target),1600,250,GetCastRange(myHero,_W),80,false,true)
 			if pred.HitChance == 1 then
 				CastSkillShot(_W, pred.PredPos.x, pred.PredPos.y, pred.PredPos.z)
 			end
