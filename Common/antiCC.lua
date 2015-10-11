@@ -222,11 +222,11 @@ local	WayOnTime, startTime, stargingPos, endingPos, radius, CCSpellTimeNeed
 local callback
 
 -- test only
-callback = function()
-	if CanUseSpell(myHero,_E) == READY then
-		CastSpell(_E)
-	end
-end
+-- callback = function()
+	-- if CanUseSpell(myHero,_W) == READY then
+	-- 	CastSpell(_W)
+	-- end
+-- end
 
 function addAntiCCCallback( callback0 )
 	callback = callback0
