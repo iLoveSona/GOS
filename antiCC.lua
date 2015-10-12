@@ -216,15 +216,15 @@ CC = {
 d = require 'DLib'
 local IsInDistance = d.IsInDistance
 local GetDistance = d.GetDistance
-
+local myHero = GetMyHero()
 local	WayOnTime, startTime, stargingPos, endingPos, radius, CCSpellTimeNeed
 
 local callback
 
 -- test only
 -- callback = function()
-	-- if CanUseSpell(myHero,_W) == READY then
-	-- 	CastSpell(_W)
+	-- if CanUseSpell(myHero,_E) == READY then
+	-- 	CastSpell(_E)
 	-- end
 -- end
 
@@ -232,12 +232,13 @@ function addAntiCCCallback( callback0 )
 	callback = callback0
 end
 
-OnProcessSpell(function(unit, spellProc)
+function OnProcessSpellCallback(unit, spellProc)
 	local CCSpell = CC[spellProc.name]
 	if CCSpell and GetTeam(unit) ~= GetTeam(myHero) then
+	-- if CCSpell then
 
 		if CCSpell.spellType == "target" and spellProc.target == myHero then
-			callback()
+			if callback then callback() end
 		end
 	
 		if CCSpell.spellType == "line" and IsInDistance(unit, CCSpell.spellRange + GetMoveSpeed(myHero)) then
@@ -251,6 +252,9 @@ OnProcessSpell(function(unit, spellProc)
 				stargingPos = spellProc.startPos
 				endingPos = spellProc.startPos + CCVector
 				radius = CCSpell.spellRadius
+
+				-- local gg =  GetOrigin(myHero) + CCVector:perpendicular():normalized()* 300
+				-- MoveToXYZ(gg)
 			end
 		end
 		
@@ -258,27 +262,46 @@ OnProcessSpell(function(unit, spellProc)
 			local spellTime = GetDistance(GetOrigin(unit), spellProc.endPos) / CCSpell.projectileSpeed * 1000 + CCSpell.spellDelay
 			delay(function()
 				if GetDistance(spellProc.endPos) <= CCSpell.spellRadius then	
-					callback()
+					if callback then callback() end
 				end
 			end, spellTime-200)
 		end
 
 		if CCSpell.spellType == "aoe"  and IsInDistance(unit, CCSpell.spellRange) then
-			callback()
+			if callback then callback() end
 		end	
 	end
 
-end)
+end
+
+OnProcessSpell(OnProcessSpellCallback)
 
 OnLoop(function (myHero)
+	-- local mousePos = GetMousePos()
+	-- DrawCircle(mousePos, 100,0,0,0xffffffff)
+	-- local mousePos2 = WorldToScreen(1, mousePos)
+	-- DrawText("x:"..mousePos.x.." y:"..mousePos.y.." z:"..mousePos.z,24,mousePos2.x,mousePos2.y+50,ARGB(255,0,255,0))
+	-- -- dummy spell
+	-- if KeyIsDown(17) then
+	-- 	local spellProc = {}
+	-- 	spellProc.name = "DarkBindingMissile"
+	-- 	spellProc.startPos = GetMousePos()
+	-- 	spellProc.endPos = GetOrigin(myHero)		
+	-- 	OnProcessSpellCallback(myHero, spellProc)
+	-- end	
+	
 	if startTime then
 		local spellPos = stargingPos + ( (GetTickCount() - startTime) * WayOnTime)
 
 		DrawCircle(endingPos, radius,3,255,0xff0ffff0)
 		DrawCircle(spellPos, radius+GetHitBox(myHero)*1.8,1,255,0xffffffff)
+		
+		-- local s = WorldToScreen(1, stargingPos)
+		-- local e = WorldToScreen(1, endingPos)
+		-- DrawLine(s.x,s.y,e.x,e.y,10,ARGB(255,255,255,255))
 
 		if GetDistance(spellPos) <= radius+GetHitBox(myHero)*1.8 then
-			callback()
+			if callback then callback() end
 		end
 
 		if GetTickCount() >= (startTime + CCSpellTimeNeed) then
