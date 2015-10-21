@@ -6,6 +6,7 @@ require 'Interrupter'
 d = require 'DLib'
 local IsInDistance = d.IsInDistance
 local ValidTarget = d.ValidTarget
+local GetDistance = d.GetDistance
 
 local submenu = menu.addItem(SubMenu.new("simple vayne"))
 local key = submenu.addItem(MenuKeyBind.new("auto stun key", string.byte(" ")))
@@ -27,26 +28,28 @@ local function AutoEiAC()
 end
 
 addInterrupterCallback(function(target, spellType, spell)
-	PrintChat(spell.name.." "..GetObjectName(target))
-	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then
-		CastTargetSpell(target, _E)
+	-- PrintChat(spell.name.." "..GetObjectName(target))
+	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY 
+		if spellType == CHANELLING_SPELLS or (spellType == GAPCLOSER_SPELLS and GetDistance(spell.startPos) > GetDistance(spell.endPos)) then
+			CastTargetSpell(target, _E)
+		end
 	end
 end)
 
-OnLoop(function(myHero)
+OnTick(function(myHero)
 	if key.getValue() or autoStun.getValue() then
 		AutoEiAC()
 	end
 end)
 
-OnProcessSpell(function(unit, spell)    
+OnProcessSpellComplete(function(unit, spell)    
   if unit == myHero and spell.name:lower():find("attack") and KeyIsDown(32) then
-   	delay(function()
+   	-- delay(function()
    		if CanUseSpell(myHero,_Q) == READY then
    			local mousePos = GetMousePos()
 				CastSkillShot(_Q, mousePos.x, mousePos.y, mousePos.z)
    		end
-   	end, GetWindUp(myHero)*1000)
+   	-- end, GetWindUp(myHero)*1000)
   end
 end)
 
