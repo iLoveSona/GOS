@@ -29,7 +29,7 @@ end
 
 addInterrupterCallback(function(target, spellType, spell)
 	-- PrintChat(spell.name.." "..GetObjectName(target))
-	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY 
+	if IsInDistance(target, GetCastRange(myHero,_E)) and CanUseSpell(myHero,_E) == READY then
 		if spellType == CHANELLING_SPELLS or (spellType == GAPCLOSER_SPELLS and GetDistance(spell.startPos) > GetDistance(spell.endPos)) then
 			CastTargetSpell(target, _E)
 		end
