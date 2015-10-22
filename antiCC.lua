@@ -232,13 +232,14 @@ function addAntiCCCallback( callback0 )
 	callback = callback0
 end
 
+local m_unit, m_spellProc
 function OnProcessSpellCallback(unit, spellProc)
 	local CCSpell = CC[spellProc.name]
 	if CCSpell and GetTeam(unit) ~= GetTeam(myHero) then
 	-- if CCSpell then
 
 		if CCSpell.spellType == "target" and spellProc.target == myHero then
-			if callback then callback() end
+			if callback then callback(unit, spellProc) end
 		end
 	
 		if CCSpell.spellType == "line" and IsInDistance(unit, CCSpell.spellRange + GetMoveSpeed(myHero)) then
@@ -255,6 +256,9 @@ function OnProcessSpellCallback(unit, spellProc)
 
 				-- local gg =  GetOrigin(myHero) + CCVector:perpendicular():normalized()* 300
 				-- MoveToXYZ(gg)
+
+				m_unit = unit
+				m_spellProc = spellProc
 			end
 		end
 		
@@ -262,13 +266,13 @@ function OnProcessSpellCallback(unit, spellProc)
 			local spellTime = GetDistance(GetOrigin(unit), spellProc.endPos) / CCSpell.projectileSpeed * 1000 + CCSpell.spellDelay
 			delay(function()
 				if GetDistance(spellProc.endPos) <= CCSpell.spellRadius then	
-					if callback then callback() end
+					if callback then callback(unit, spellProc) end
 				end
 			end, spellTime-200)
 		end
 
 		if CCSpell.spellType == "aoe"  and IsInDistance(unit, CCSpell.spellRange) then
-			if callback then callback() end
+			if callback then callback(unit, spellProc) end
 		end	
 	end
 
@@ -301,7 +305,7 @@ OnLoop(function (myHero)
 		-- DrawLine(s.x,s.y,e.x,e.y,10,ARGB(255,255,255,255))
 
 		if GetDistance(spellPos) <= radius+GetHitBox(myHero)*1.8 then
-			if callback then callback() end
+			if callback then callback(m_unit, m_spellProc) end
 		end
 
 		if GetTickCount() >= (startTime + CCSpellTimeNeed) then

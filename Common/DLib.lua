@@ -2403,7 +2403,7 @@ function ilib.GetTarget(range, damageType)
 	local target, steps = nil, 10000
 	for _, k in pairs(ilib.GetEnemyHeroes()) do
 		local step = GetCurrentHP(k) / ilib.CalcDamage(GetMyHero(), k, DAMAGE_PHYSICAL == damageType and 100 or 0, DAMAGE_MAGIC == damageType and 100 or 0)
-		if k and ilib.ValidTarget(k, range) and step < steps then
+		if k and ilib.ValidTarget(k, range+GetHitBox(k)) and step < steps then
 			target = k
 			steps = step
 		end
