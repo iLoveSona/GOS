@@ -167,7 +167,7 @@ local function castR( target )
 	elseif ultModeType == 2 and not ultKey.getValue() then return
 	end
 
-	if IsInDistance(rTarget, rRange) then
+	if ValidTarget(rTarget, rRange) then
 		-- CastStartPosVec,EnemyChampionPtr,EnemyMoveSpeed,YourSkillshotSpeed,SkillShotDelay,SkillShotRange,SkillShotWidth,MinionCollisionCheck,AddHitBox;
 		local pred = GetPredictionForPlayer(GetOrigin(myHero),rTarget,GetMoveSpeed(rTarget),math.huge,600,rRange,170,false,true);
 	 	if pred.HitChance == 1 then
