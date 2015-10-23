@@ -8,6 +8,9 @@ local ValidTarget = d.ValidTarget
 local GetEnemyHeroes = d.GetEnemyHeroes
 local CalcDamage = d.CalcDamage
 
+local submenu = menu.addItem(SubMenu.new("simple garen"))
+local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
+
 local atkRange = GetRange(myHero)
 
 -- testing
@@ -49,13 +52,18 @@ OnTick(function(myHero)
 	
 end)
 
+require('simple orbwalk')
 OnProcessSpellComplete(function(unit, spell)
-  if unit == myHero and spell.name:lower():find("attack") and KeyIsDown(32) then
+  if unit == myHero and spell.name:lower():find("attack") and combo.getValue() then
    	if CanUseSpell(myHero,_Q) == READY then
    		CastSpell(_Q)
    	elseif CanUseSpell(myHero,_E) == READY and GetCastName(myHero, _E) == "GarenE" then
    		CastSpell(_E)
    	end
+  end
+
+  if unit == myHero and spell.name == "GarenQ" then
+		resetAA()
   end
 end)
 

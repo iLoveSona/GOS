@@ -9,6 +9,9 @@ local GetEnemyHeroes = d.GetEnemyHeroes
 local GetTarget = d.GetTarget
 local GetDistance = d.GetDistance
 
+local submenu = menu.addItem(SubMenu.new("simple darius"))
+local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
+
 addInterrupterCallback(function(target, spellType, spell)
 	if IsInDistance(target, GetCastRange(myHero, _E)) and CanUseSpell(myHero,_E) == READY and spellType == CHANELLING_SPELLS then
 		CastSkillShot(_E,GetOrigin(target))
@@ -57,7 +60,7 @@ local function castQ()
 end
 
 local eRange = GetCastRange(myHero, _E)
-local activeERange = GetRange(myHero) + 100
+local activeERange = GetRange(myHero) + GetHitBox(myHero) + 100
 local function castE()
 	local target = GetTarget(eRange, DAMAGE_PHYSICAL)
 	if target and CanUseSpell(myHero, _E) == READY and GetDistance(target) > activeERange then
@@ -65,19 +68,28 @@ local function castE()
 	end
 end
 
+require('simple orbwalk')
 OnTick(function(myHero)
 	castR()
 		
-	if KeyIsDown(32) then
+	if combo.getValue() then
 		castE()
-		castQ()
+		if CanUseSpell(myHero, _W) ~= READY then
+			castQ()
+		end
 	end
 
 end)
 
 OnProcessSpellComplete(function(unit, spell)
-  if unit == myHero and spell.name:lower():find("attack") and KeyIsDown(32) and CanUseSpell(myHero,_W) == READY then
+  if unit == myHero and spell.name:lower():find("attack") and combo.getValue() and CanUseSpell(myHero,_W) == READY then
    	CastSpell(_W)
+  end
+end)
+
+OnProcessSpell(function(unit, spell)
+	if unit == myHero and spell.name == "DariusNoxianTacticsONH" then
+		resetAA()
   end
 end)
 

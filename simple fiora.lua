@@ -10,6 +10,9 @@ local GetEnemyHeroes = d.GetEnemyHeroes
 local CalcDamage = d.CalcDamage
 local GetDistance = d.GetDistance
 
+local submenu = menu.addItem(SubMenu.new("simple fiora"))
+local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
+
 require 'antiCC'
 addAntiCCCallback(function(unit, spellProc)
 	if CanUseSpell(myHero,_W) == READY then
@@ -58,7 +61,7 @@ end
 
 OnTick(function(myHero)
 	local buff_pos, distance = getNearestPos()
-	if buff_pos and KeyIsDown(32) and distance > 100 and distance < 700 then
+	if buff_pos and combo.getValue() and distance > 100 and distance < 700 then
 		if CanUseSpell(myHero,_Q) == READY and distance < GetCastRange(myHero,_Q) then
    		CastSkillShot(_Q,buff_pos)
    	elseif not canAttack() then
@@ -83,11 +86,14 @@ OnDraw(function(myHero)
 end)
 
 OnProcessSpellComplete(function(unit, spell)
-  if unit == myHero and spell.name:lower():find("attack") and KeyIsDown(32) then
+  if unit == myHero and spell.name:lower():find("attack") and combo.getValue() then
    	if CanUseSpell(myHero,_E) == READY then
    		CastSpell(_E)
-   		resetAA()
    	end
+  end
+
+  if unit == myHero and spell.name == "FioraE" then
+		resetAA()
   end
 end)
 

@@ -210,7 +210,18 @@ CC = {
 ["TimeWarp"]					= 	{ slot = _E , champName = "Zilean"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 0	, spellRange = 550		, spellRadius = 0		, collision = false	},
 -- Zyra
 ["ZyraGraspingRoots"]			= 	{ slot = _E , champName = "Zyra"				, spellType = "line" 		, projectileSpeed = 1400		, spellDelay = 250	, spellRange = 1150		, spellRadius = 70		, collision = false	},
-["ZyraBrambleZone"]				= 	{ slot = _R , champName = "Zyra"				, spellType = "circular" 	, projectileSpeed = math.huge	, spellDelay = 500	, spellRange = 700		, spellRadius = 525		, collision = false	}
+["ZyraBrambleZone"]				= 	{ slot = _R , champName = "Zyra"				, spellType = "circular" 	, projectileSpeed = math.huge	, spellDelay = 500	, spellRange = 700		, spellRadius = 525		, collision = false	},
+
+--danger spell list
+["InfernalGuardian"] 						= 	{ slot = _R , champName = "Annie"				, spellType = "circular" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["Feast"] 						= 	{ slot = _R , champName = "Chogath"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["DariusExecute"] 						= 	{ slot = _R , champName = "Darius"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["GarenR"] 						= 	{ slot = _R , champName = "Garen"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["SkarnerImpale"] 						= 	{ slot = _R , champName = "Skarner"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["LissandraR"] 						= 	{ slot = _R , champName = "Lissandra"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["BlindMonkR"] 						= 	{ slot = _R , champName = "LeeSin"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["zedult"] 						= 	{ slot = _R , champName = "Zed"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+["infiniteduresschannel"] 						= 	{ slot = _R , champName = "Warwick"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	}
 }
 
 d = require 'DLib'

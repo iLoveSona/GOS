@@ -11,6 +11,7 @@ local GetDistance = d.GetDistance
 local submenu = menu.addItem(SubMenu.new("simple vayne"))
 local key = submenu.addItem(MenuKeyBind.new("auto stun key", string.byte(" ")))
 local autoStun = submenu.addItem(MenuBool.new("auto stun when possible", true))
+local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
 
 -- modify from IAC vayne
 local function AutoEiAC()
@@ -42,14 +43,18 @@ OnTick(function(myHero)
 	end
 end)
 
+require('simple orbwalk')
 OnProcessSpellComplete(function(unit, spell)    
-  if unit == myHero and spell.name:lower():find("attack") and KeyIsDown(32) then
-   	-- delay(function()
-   		if CanUseSpell(myHero,_Q) == READY then
-   			local mousePos = GetMousePos()
-				CastSkillShot(_Q, mousePos.x, mousePos.y, mousePos.z)
-   		end
-   	-- end, GetWindUp(myHero)*1000)
+  if unit == myHero and spell.name:lower():find("attack") and combo.getValue() then
+   	if CanUseSpell(myHero,_Q) == READY then
+			CastSkillShot(_Q, GetMousePos())			
+   	end
+  end
+end)
+
+OnProcessSpell(function(unit, spell)
+	if unit == myHero and spell.name == "VayneTumble" then
+		resetAA()
   end
 end)
 

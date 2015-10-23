@@ -3,6 +3,9 @@ local myHero = GetMyHero()
 d = require 'DLib'
 local GetTarget = d.GetTarget
 
+local submenu = menu.addItem(SubMenu.new("simple orbwalk"))
+local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
+
 local baseAS = GetBaseAttackSpeed(myHero)
 
 local nextAttackTime = 0
@@ -24,10 +27,6 @@ function canMove(setting)
 	end
 end
 
-function resetAA()
-	nextAttackTime = 0
-end
-
 local function getMyRange()
 	return GetRange(myHero) + GetHitBox(myHero)
 end
@@ -41,19 +40,27 @@ local function orbwalk()
 	end
 end
 
+function resetAA()
+  nextAttackTime = 0
+  if combo.getValue() then
+    orbwalk()
+  end
+end
+
+-- modify from inspired
 local function CastOffensiveItems(unit)
   i = {3748, 3074, 3077, 3142, 3184}
   u = {3153, 3146, 3144}
   for _,k in pairs(i) do
     slot = GetItemSlot(GetMyHero(),k)
-    if slot ~= nil and slot ~= 0 and CanUseSpell(GetMyHero(), slot) == READY then
-      CastTargetSpell(GetMyHero(), slot)
+    if slot ~= nil and slot ~= 0 and CanUseSpell(myHero, slot) == READY then
+      CastTargetSpell(myHero, slot)
       return true
     end
   end
   for _,k in pairs(u) do
-    slot = GetItemSlot(GetMyHero(),k)
-    if slot ~= nil and slot ~= 0 and CanUseSpell(GetMyHero(), slot) == READY then
+    slot = GetItemSlot(myHero,k)
+    if slot ~= nil and slot ~= 0 and CanUseSpell(myHero, slot) == READY then
       CastTargetSpell(unit, slot)
       return true
     end
@@ -62,7 +69,7 @@ local function CastOffensiveItems(unit)
 end
 
 OnTick(function(myHero)
-	if KeyIsDown(32) then
+	if combo.getValue() then
 		orbwalk()
 	end
 end)
@@ -73,6 +80,9 @@ OnProcessSpellComplete(function(unit, spellProc)
   		CastOffensiveItems(unit)
   	end
    	nextAttackTime = GetTickCount() + 1000 / (GetAttackSpeed(unit) * baseAS)
+    if combo.getValue() then
+      orbwalk()
+    end
   end
 end)
 
