@@ -85,13 +85,16 @@ OnDraw(function(myHero)
 	end
 end)
 
-OnProcessSpellComplete(function(unit, spell)
-  if unit == myHero and spell.name:lower():find("attack") and combo.getValue() then
-   	if CanUseSpell(myHero,_E) == READY then
-   		CastSpell(_E)
-   	end
+addResetAASpell(function()
+	if CanUseSpell(myHero,_E) == READY then
+   	CastSpell(_E)
+		return true
+	else
+		return false
   end
+end)
 
+OnProcessSpellComplete(function(unit, spell)
   if unit == myHero and spell.name == "FioraE" then
 		resetAA()
   end

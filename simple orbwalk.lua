@@ -2,50 +2,12 @@ local myHero = GetMyHero()
 
 d = require 'DLib'
 local GetTarget = d.GetTarget
+local GetDistance = d.GetDistance
 
 local submenu = menu.addItem(SubMenu.new("simple orbwalk"))
 local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
 
 local baseAS = GetBaseAttackSpeed(myHero)
-
-local nextAttackTime = 0
-local isAttackOn = true
-function canAttack(setting)
-	if setting then
-		isAttackOn = setting
-	else
-		return nextAttackTime < GetTickCount() and isAttackOn
-	end
-end
-
-local isMoveOn = true
-function canMove(setting)
-	if setting then 
-		isMoveOn = setting
-	else
-		return isMoveOn
-	end
-end
-
-local function getMyRange()
-	return GetRange(myHero) + GetHitBox(myHero)
-end
-
-local function orbwalk()
-	local target = GetTarget(getMyRange(), DAMAGE_PHYSICAL)
-	if target and canAttack() then
-		AttackUnit(target)
-	elseif canMove() then
-		MoveToXYZ(GetMousePos())
-	end
-end
-
-function resetAA()
-  nextAttackTime = 0
-  if combo.getValue() then
-    orbwalk()
-  end
-end
 
 -- modify from inspired
 local function CastOffensiveItems(unit)
@@ -68,21 +30,68 @@ local function CastOffensiveItems(unit)
   return false
 end
 
+local nextAttackTime = 0
+local isAttackOn = true
+function canAttack(setting)
+	if setting then
+		isAttackOn = setting
+	else
+		return nextAttackTime < GetTickCount() and isAttackOn
+	end
+end
+
+local nextMoveTime = 0
+local isMoveOn = true
+function canMove(setting)
+	if setting then 
+		isMoveOn = setting
+	else
+		return nextMoveTime < GetTickCount() and isMoveOn
+	end
+end
+
+local function getMyRange()
+	return GetRange(myHero) + GetHitBox(myHero)
+end
+
+local function orbwalk()
+	local target = GetTarget(getMyRange(), DAMAGE_PHYSICAL)
+	if target and canAttack() then
+    AttackUnit(target)
+  elseif target and CastOffensiveItems(target) then
+    -- do nothing
+	elseif canMove() then
+		MoveToXYZ(GetMousePos())
+	end
+end
+
+function resetAA()
+  nextAttackTime = 0
+end
+
+local resetAASpell = nil
+function addResetAASpell(resetAASpell0)
+  resetAASpell = resetAASpell0
+end
+
 OnTick(function(myHero)
 	if combo.getValue() then
 		orbwalk()
 	end
 end)
 
-OnProcessSpellComplete(function(unit, spellProc)
+OnProcessSpell(function(unit, spellProc)
   if unit == myHero and spellProc.name:lower():find("attack") then
+    local windup = spellProc.windUpTime * 1000
   	if GetObjectType(spellProc.target) == Obj_AI_Hero then
-  		CastOffensiveItems(unit)
+      delay(function()
+        if resetAASpell and not resetAASpell() then
+          -- CastOffensiveItems(unit)
+        end
+      end, windup)  		
   	end
-   	nextAttackTime = GetTickCount() + 1000 / (GetAttackSpeed(unit) * baseAS)
-    if combo.getValue() then
-      orbwalk()
-    end
+   	nextAttackTime = GetTickCount() + 1000 / (GetAttackSpeed(unit) * baseAS) + GetLatency()
+    nextMoveTime = GetTickCount() + windup + GetLatency()
   end
 end)
 

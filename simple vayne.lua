@@ -41,16 +41,31 @@ OnTick(function(myHero)
 	if key.getValue() or autoStun.getValue() then
 		AutoEiAC()
 	end
+
+	-- if shouldReset then
+	-- 	if CanUseSpell(myHero,_Q) == READY then
+	-- 		CastSkillShot(_Q, GetMousePos())			
+	-- 		shouldReset = false
+ --   	end
+	-- end
 end)
 
 require('simple orbwalk')
-OnProcessSpellComplete(function(unit, spell)    
-  if unit == myHero and spell.name:lower():find("attack") and combo.getValue() then
-   	if CanUseSpell(myHero,_Q) == READY then
-			CastSkillShot(_Q, GetMousePos())			
-   	end
+addResetAASpell(function()
+	if CanUseSpell(myHero,_Q) == READY then
+		CastSkillShot(_Q, GetMousePos())
+		return true
+	else
+		return false
   end
 end)
+-- OnProcessSpellComplete(function(unit, spell)    
+--   if unit == myHero and spell.name:lower():find("attack") and combo.getValue() then
+--    	if CanUseSpell(myHero,_Q) == READY then		
+-- 			shouldReset = true
+--    	end
+--   end
+-- end)
 
 OnProcessSpell(function(unit, spell)
 	if unit == myHero and spell.name == "VayneTumble" then
