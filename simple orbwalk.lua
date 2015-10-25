@@ -9,7 +9,7 @@ local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
 
 local baseAS = GetBaseAttackSpeed(myHero)
 
--- modify from inspired
+-- copy from inspired
 local function CastOffensiveItems(unit)
   i = {3748, 3074, 3077, 3142, 3184}
   u = {3153, 3146, 3144}
@@ -58,7 +58,7 @@ local function orbwalk()
 	local target = GetTarget(getMyRange(), DAMAGE_PHYSICAL)
 	if target and canAttack() then
     AttackUnit(target)
-  elseif target and CastOffensiveItems(target) then
+  elseif target and canMove() and CastOffensiveItems(target) then
     -- do nothing
 	elseif canMove() then
 		MoveToXYZ(GetMousePos())
@@ -85,6 +85,7 @@ OnProcessSpell(function(unit, spellProc)
     local windup = spellProc.windUpTime * 1000
   	if GetObjectType(spellProc.target) == Obj_AI_Hero then
       delay(function()
+        if not combo.getValue() then return end
         if resetAASpell and not resetAASpell() then
           -- CastOffensiveItems(unit)
         end

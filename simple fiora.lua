@@ -61,10 +61,10 @@ end
 
 OnTick(function(myHero)
 	local buff_pos, distance = getNearestPos()
-	if buff_pos and combo.getValue() and distance > 100 and distance < 700 then
+	if buff_pos and combo.getValue() and distance > 100 then
 		if CanUseSpell(myHero,_Q) == READY and distance < GetCastRange(myHero,_Q) then
    		CastSkillShot(_Q,buff_pos)
-   	elseif not canAttack() then
+   	elseif not canAttack() and canMove() then
    		canMove(false)
    		MoveToXYZ(buff_pos)
    	end
