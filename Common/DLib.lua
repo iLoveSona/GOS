@@ -1,4 +1,4 @@
-local version = 23
+local version = 24
 
 local require2 = _G.require
 
@@ -2065,10 +2065,14 @@ else
 	PrintChat("GOSUtility.dll not found. Functions using GOSUtility won't work.")
 end
 
-OnLoop(function()
+OnTick(function()
 	local tickcount=GetTickCount()
 	pollKeysOnLoop()
-	delayedOnLoop(tickcount)
+	delayedOnLoop(tickcount)	
+end)
+
+OnDraw(function()
+	local tickcount=GetTickCount()
 	notificationsOnLoop(tickcount)
 	menu.onLoop()
 end)

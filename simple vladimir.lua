@@ -13,7 +13,7 @@ addAntiCCCallback(function()
 	end
 end)
 
-OnLoop(function(myHero)
+OnTick(function(myHero)
 	local target = GetCurrentTarget()
 	
 	if ValidTarget(target) then

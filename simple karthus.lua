@@ -42,6 +42,7 @@ local function castE( target )
 	end
 end
 
+local info = ""
 local function killableInfo()
 	-- no need show killable info when R in cd
 	if CanUseSpell(myHero,_R) ~= READY then return end
@@ -63,11 +64,16 @@ local function killableInfo()
 			-- info = info..GetObjectName(enemy).."    HP:"..hp.."  dmg: "..realdmg.." "..killable.."\n"
 		end
   end
-  DrawText(info,40,500,0,0xffff0000) 
+  
 end
 
-OnLoop(function(myHero)
+OnDraw(function()
+	DrawText(info,40,500,0,0xffff0000) 
+end)
+
+OnTick(function(myHero)
 	killableInfo()
+
 	local target = GetCurrentTarget()
 	if ValidTarget(target) then
 		if KeyIsDown(32) then

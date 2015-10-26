@@ -138,11 +138,15 @@ local function putWard(pos0)
 end
 
 local function drawDebugInfo()
-	DrawCircle(mousePos.x,mousePos.y,mousePos.z,200,0,0,0xff00ff00);
+	if mousePos then
+		DrawCircle(mousePos.x,mousePos.y,mousePos.z,200,0,0,0xff00ff00);
+	end
 	if wardpos then
 		DrawCircle(wardpos.x,wardpos.y,wardpos.z,200,0,0,0xffffff00);
 	end
-	DrawCircle(maxPos.x,maxPos.y,maxPos.z,200,0,0,0xffff0000);
+	if maxPos then
+		DrawCircle(maxPos.x,maxPos.y,maxPos.z,200,0,0,0xffff0000);
+	end
 	DrawCircle( GetOrigin(myHero).x,GetOrigin(myHero).y,GetOrigin(myHero).z,GetCastRange(myHero,spellSlot),0,0,0xffffffff);
 
 	if jumpTarget then
@@ -233,13 +237,15 @@ local function GetJumpTarget()
 	return findTargetInList(objectList, pos)
 end
 
-OnLoop(function(myHero)
+OnDraw(function()
+	if debug then	drawDebugInfo()	end	
+end)
+
+OnTick(function(myHero)
 	mousePos = GetMousePos()
 	maxPos = calcMaxPos(mousePos)
 
-	jumpTarget = GetJumpTarget()
-
-	if debug then	drawDebugInfo()	end	
+	jumpTarget = GetJumpTarget()	
 
 	-- check spell name not lee W2
 	if canWardJump() and jumpTarget and wardLock then

@@ -291,7 +291,7 @@ end
 
 OnProcessSpell(OnProcessSpellCallback)
 
-OnLoop(function (myHero)
+OnDraw(function (myHero)
 	-- local mousePos = GetMousePos()
 	-- DrawCircle(mousePos, 100,0,0,0xffffffff)
 	-- local mousePos2 = WorldToScreen(1, mousePos)

@@ -65,7 +65,7 @@ local function doLevelSpell()
 	end
 end
 
-OnLoop(function(myHero)
+OnTick(function(myHero)
 	local newLv = GetLevel(myHero)
 
 	-- only level spell when level up

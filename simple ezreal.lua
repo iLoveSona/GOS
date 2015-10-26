@@ -4,7 +4,7 @@ local d = require 'DLib'
 local IsInDistance = d.IsInDistance
 local ValidTarget = d.ValidTarget
 
-OnLoop(function(myHero)
+OnTick(function(myHero)
 	local target = GetCurrentTarget()
 	
 	if KeyIsDown(32) and ValidTarget(target) then

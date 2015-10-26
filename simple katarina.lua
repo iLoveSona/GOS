@@ -15,7 +15,7 @@ local GetEnemyHeroes = d.GetEnemyHeroes
 local GetDistance = d.GetDistance
 
 local wardRange = 600
-OnLoop(function(myHero)
+OnDraw(function(myHero)
 	local target = GetCurrentTarget()
 
 	-- KillableInfo(target)
