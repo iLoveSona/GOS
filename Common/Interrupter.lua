@@ -119,7 +119,7 @@ d.initCallback(function(result)
 end)
 
 OnProcessSpell(function(unit, spell)    
-    if not loaded and not callback or not unit or GetObjectType(unit) ~= Obj_AI_Hero  or GetTeam(unit) == myTeam then return end
+    if not loaded or not callback or not unit or GetObjectType(unit) ~= Obj_AI_Hero  or GetTeam(unit) == myTeam then return end
     local unitName = GetObjectName(unit)
     local unitChanellingSpells = CHANELLING_SPELLS[unitName]
     local unitGapcloserSpells = GAPCLOSER_SPELLS[unitName]
