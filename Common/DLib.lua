@@ -1,4 +1,4 @@
-local version = 24
+local version = 25
 
 local require2 = _G.require
 
@@ -6,10 +6,10 @@ libTable = {
 	-- ["DLib"] = "iLoveSona/GOS/master/Common/DLib.lua",
 	["simple ward jump"] = "iLoveSona/GOS/master/simple%20ward%20jump.lua",
 	["simple auto level spell"] = "iLoveSona/GOS/master/simple%20auto%20level%20spell.lua",
+	["simple orbwalk"] = "iLoveSona/GOS/master/simple%20orbwalk.lua",
+	["antiCC"] = "iLoveSona/GOS/master/antiCC.lua",
 	["Interrupter"] = "iLoveSona/GOS/master/Common/Interrupter.lua",
 	["Inspired"] = "Inspired-gos/scripts/master/Common/Inspired.lua",
-	["IOW"] = "Inspired-gos/scripts/master/Common/IOW.lua",
-	-- ["IAC"] = "Inspired-gos/scripts/master/Common/IAC.lua",
 	["MapPosition"] = "Maxxxel/GOS/master/Common/Utility/MapPosition.lua",
 	["MapPositionGOS"] = "Maxxxel/GOS/master/Common/Utility/MapPositionGOS.lua",
 	["MapPosition_bushes_1"] = "Maxxxel/GOS/master/Common/Utility/MapPosition_bushes_1.lua",
@@ -27,7 +27,7 @@ function require( m, hideErr )
 	if not ok then
 		local url = libTable[m]
 			if  url then 
-			print(err)
+			-- print(err)
 			PrintChat("<font color=\"#00CCFF\"><b>LOAD \""..m..".lua\" FAIL, auto fix mode: try redownload the script, plz waiting...</b></font>")
 			saveScript("Common\\"..m, webRequest("github", url.."?rand="..math.random(1,10000)))
 			PrintChat("<font color=\"#00CCFF\"><b> auto fix mode: \""..m..".lua\" updated, press F6-F6 to reload.</b></font>")
@@ -354,7 +354,7 @@ end
 --REGION Menu------------------------------------------------------------------
 --{
 local ITEMHEIGHT=30
-local ITEMWIDTH=100
+local ITEMWIDTH=200
 local TEXTYOFFSET=-7
 local TOGGLEWIDTH=30
 local MENUTEXTCOLOR=0xFFFFFFFF
@@ -2037,7 +2037,6 @@ end
 --ENDREGION Updater-----------------------------------------------------------}
 
 
-
 package.cpath=string.gsub(package.path, ".lua", ".dll")
 
 c=Config.new()
@@ -2050,7 +2049,7 @@ g=prequire("GOSUtility")
 if g then
 	local UP=Updater.new("iLoveSona/GOS/master/Common/DLib.lua", "Common\\DLib", version)
 	if UP.newVersion() then UP.update() end
-	if gVersion()<6 then 
+	if gVersion()<7 then 
 		notification("plz Redownload GOSUtility", 10000) 
 	else
 		local versionCode = lolVersion()
@@ -2415,9 +2414,9 @@ function ilib.GetTarget(range, damageType)
 	return target
 end
 
-local callback = nil
-function ilib.initCallback(callback0)
-	callback = callback0
+local callbackList = {}
+function ilib.initCallback(callback)
+	table.insert(callbackList, callback)
 end
 
 function ilib.init()
@@ -2448,8 +2447,9 @@ function ilib.init()
 	-- end)
 
 	local initHeroCounter = 0
-	local print = print
-	OnObjectLoop(function(object,myHero)
+	-- local print = print
+	-- PrintChat not work here...don't know why(will miss print something)
+	OnObjectLoad(function(object,myHero)
 		if initHeroCounter >= 9 then return end
 		-- if done then return end
 
@@ -2467,9 +2467,73 @@ function ilib.init()
 			end
 			initHeroCounter = initHeroCounter + 1
 			-- print(initHeroCounter)
-			if initHeroCounter >= 9 and callback then callback(true) end
+			if initHeroCounter >= 9 then
+				for _,callback in pairs(callbackList) do
+					callback(true)
+				end
+			end
 		end
 	end)
+end
+
+local function ExcludeFurthest(point, listOfEntities)
+	local removalId
+
+	for id,entity in pairs(listOfEntities) do
+		if not removalId or ilib.GetDistance(point, entity) > ilib.GetDistance(point, listOfEntities[removalId]) then
+			removalId = id
+		end
+	end
+
+	listOfEntities[removalId] = nil
+
+	return listOfEntities
+end
+
+-- minimum enclosing circle(MEC)
+local function GetMEC(aoe_radius, listOfEntities)
+	local average = {x=0, y=0, z=0, count = 0}
+
+	for _,entity in pairs(listOfEntities) do
+		local ori = GetOrigin(entity)
+		average.x = average.x + ori.x
+		average.y = average.y + ori.y
+		average.z = average.z + ori.z
+		average.count = average.count + 1
+	end
+
+	-- list is empty
+	if average.count == 0 then return average end
+
+  average.x = average.x / average.count
+  average.y = average.y / average.count
+  average.z = average.z / average.count
+
+  local targetsInRange = 0
+  for _,entity in pairs(listOfEntities) do
+    if ilib.GetDistance(average, entity) <= aoe_radius then
+      targetsInRange = targetsInRange + 1
+    end
+  end
+
+  if targetsInRange == average.count then
+    return average
+  else
+    return GetMEC(aoe_radius, ExcludeFurthest(average, listOfEntities))
+  end
+end
+
+function ilib.GetPosForAoeSpell(startPos, castRange, spellRadius)
+	local list = ilib.GetEnemyHeroes()
+	local range = castRange + spellRadius
+	
+	local tempList = {}
+	for key,enemy in pairs(list) do
+		if ilib.ValidTarget(enemy) and ilib.GetDistance(startPos, GetOrigin(enemy)) < range then
+			tempList[key] = list[key]
+		end
+	end
+	return GetMEC(spellRadius, tempList)
 end
 
 ilib.init()

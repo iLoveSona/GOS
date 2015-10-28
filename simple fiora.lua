@@ -1,7 +1,7 @@
 local myHero = GetMyHero()
 if GetObjectName(myHero) ~= "Fiora" then return end
 
-local debug = true
+local debug = false
 
 d = require 'DLib'
 local IsInDistance = d.IsInDistance
@@ -106,12 +106,12 @@ OnCreateObj(function(object)
 	end
 
 	if debug and GetObjectBaseName(object):find("Fiora_Base") and not GetObjectBaseName(object):lower():find("speed")then
-		-- PrintChat(
-		-- 	""..GetObjectBaseName(object).."  "..
-		-- 	"IsVisible : "..tostring(IsVisible(object)).."  "..
-		-- 	"GetTeam : "..GetTeam(object).."  "..
-		-- 	"IsTargetable : "..tostring(IsTargetable(object)).."  "
-		-- 	)
+		PrintChat(
+			""..GetObjectBaseName(object).."  "..
+			"IsVisible : "..tostring(IsVisible(object)).."  "..
+			"GetTeam : "..GetTeam(object).."  "..
+			"IsTargetable : "..tostring(IsTargetable(object)).."  "
+			)
 	end
 end)
 

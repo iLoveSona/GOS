@@ -1,10 +1,14 @@
-if GetObjectName(GetMyHero()) ~= "Vladimir" then return end
+local myHero = GetMyHero()
+if GetObjectName(myHero) ~= "Vladimir" then return end
 
 local d = require 'DLib'
-local IsInDistance = d.IsInDistance
 local ValidTarget = d.ValidTarget
-local GetDistance = d.GetDistance
-local GetEnemyHeroes = d.GetEnemyHeroes
+local GetTarget = d.GetTarget
+local GetPosForAoeSpell = d.GetPosForAoeSpell
+
+local submenu = menu.addItem(SubMenu.new("simple vladimir"))
+local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
+local ultNumber = submenu.addItem(MenuSlider.new("ult when", 3, 1, 5, 1))
 
 require 'antiCC'
 addAntiCCCallback(function()
@@ -13,90 +17,34 @@ addAntiCCCallback(function()
 	end
 end)
 
+local qRange = GetCastRange(myHero, _Q)
+local rRange = GetCastRange(myHero, _R)
 OnTick(function(myHero)
-	local target = GetCurrentTarget()
-	
-	if ValidTarget(target) then
-		if CanUseSpell(myHero, _Q) == READY and IsInDistance(target, GetCastRange(myHero,_Q)) then	
-			CastTargetSpell(target, _Q)
-		end
+
+	-- auto Q
+	local target = GetTarget(qRange, DAMAGE_MAGIC)
+	if target and CanUseSpell(myHero, _Q) == READY then	
+		CastTargetSpell(target, _Q)
+	end
+
+	if combo.getValue() then
 
 		-- Vladimir' E range 600
-		if KeyIsDown(32) and CanUseSpell(myHero, _E) == READY and IsInDistance(target, 600) then
+		if CanUseSpell(myHero, _E) == READY and ValidTarget(GetCurrentTarget(), 600) then
 			CastSpell(_E)			
 		end
-
-		if KeyIsDown(32) then
-			local result = GetPosForAoeSpell(GetOrigin(myHero), GetCastRange(myHero,_R), 375)
-			if result.count >= 3 then
-				-- PrintChat(result.count)
-				-- DrawCircle(result, 375,3,255,0xffff0000)
-				if CanUseSpell(myHero, _R) == READY then
-					CastSkillShot(_R,result.x,result.y,result.z)
-				end
+		
+		if CanUseSpell(myHero, _R) == READY then
+			local result = GetPosForAoeSpell(GetOrigin(myHero), rRange, 375)
+			-- PrintChat(result.count)
+			-- DrawCircle(result, 375,3,255,0xffff0000)
+			if result.count >= ultNumber.getValue() then
+				CastSkillShot(_R,result.x,result.y,result.z)
 			end
 		end
-	end
-end)
 
-function GetPosForAoeSpell(startPos, castRange, spellRadius)
-	local list = GetEnemyHeroes()
-	local range = castRange + spellRadius
+	end
 	
-	local tempList = {}
-	for key,enemy in pairs(list) do
-		if ValidTarget(enemy) and GetDistance(startPos, GetOrigin(enemy)) < range then
-			tempList[key] = list[key]
-		end
-	end
-	return GetMEC(spellRadius, tempList)
-end
-
-function ExcludeFurthest(point, listOfEntities)
-	local removalId
-
-	for id,entity in pairs(listOfEntities) do
-		if not removalId or GetDistance(point, entity) > GetDistance(point, listOfEntities[removalId]) then
-			removalId = id
-		end
-	end
-
-	listOfEntities[removalId] = nil
-
-	return listOfEntities
-end
-
--- minimum enclosing circle(MEC)
-function GetMEC(aoe_radius, listOfEntities)
-	local average = {x=0, y=0, z=0, count = 0}
-
-	for _,entity in pairs(listOfEntities) do
-		local ori = GetOrigin(entity)
-		average.x = average.x + ori.x
-		average.y = average.y + ori.y
-		average.z = average.z + ori.z
-		average.count = average.count + 1
-	end
-
-	-- list is empty
-	if average.count == 0 then return average end
-
-  average.x = average.x / average.count
-  average.y = average.y / average.count
-  average.z = average.z / average.count
-
-  local targetsInRange = 0
-  for _,entity in pairs(listOfEntities) do
-    if GetDistance(average, entity) <= aoe_radius then
-      targetsInRange = targetsInRange + 1
-    end
-  end
-
-  if targetsInRange == average.count then
-    return average
-  else
-    return GetMEC(aoe_radius, ExcludeFurthest(average, listOfEntities))
-  end
-end
+end)
 
 PrintChat("simple vladimir script loaded")

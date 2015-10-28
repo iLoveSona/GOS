@@ -1,3 +1,4 @@
+if _G.simpleOrbwalkLoaded then return end
 local myHero = GetMyHero()
 
 d = require 'DLib'
@@ -96,4 +97,5 @@ OnProcessSpell(function(unit, spellProc)
   end
 end)
 
+_G.simpleOrbwalkLoaded = true
 PrintChat("simple orbwalk loaded")

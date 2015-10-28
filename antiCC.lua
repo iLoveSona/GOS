@@ -230,8 +230,12 @@ local GetDistance = d.GetDistance
 local myHero = GetMyHero()
 local	WayOnTime, startTime, stargingPos, endingPos, radius, CCSpellTimeNeed
 
-local callback
-
+local callbackList = {}
+local function callback(unit, spellProc)
+	for _,callbackFunc in pairs(callbackList) do
+		callbackFunc(unit, spellProc)
+	end
+end
 -- test only
 -- callback = function()
 	-- if CanUseSpell(myHero,_E) == READY then
@@ -239,8 +243,8 @@ local callback
 	-- end
 -- end
 
-function addAntiCCCallback( callback0 )
-	callback = callback0
+function addAntiCCCallback( callback )
+	table.insert(callbackList, callback)
 end
 
 local m_unit, m_spellProc
