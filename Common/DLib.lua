@@ -1,4 +1,4 @@
-local version = 25
+local version = 26
 
 local require2 = _G.require
 
@@ -2364,9 +2364,15 @@ function ilib.GetDistanceSqr(p1,p2)
     return dx*dx + dz*dz
 end
 
+local bufflist = {
+	"sionpassivezombie"
+}
 function ilib.ValidTarget(unit, range)
     range = range or 25000
     if not unit or not GetOrigin(unit) or not IsTargetable(unit) or IsImmune(unit, myHero) or IsDead(unit) or not IsVisible(unit) or GetTeam(unit) == myTeam or not ilib.IsInDistance(unit, range) then return false end
+    for _,buff in ipairs(bufflist) do
+    	if GotBuff(unit, buff) > 0 then return false end
+    end    
     return true
 end
 
