@@ -224,11 +224,16 @@ CC = {
 ["infiniteduresschannel"] 						= 	{ slot = _R , champName = "Warwick"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	}
 }
 
+local debug = false
+
 d = require 'DLib'
 local IsInDistance = d.IsInDistance
 local GetDistance = d.GetDistance
 local myHero = GetMyHero()
-local	WayOnTime, startTime, stargingPos, endingPos, radius, CCSpellTimeNeed
+
+
+-- local	WayOnTime, startTime, stargingPos, endingPos, radius, CCSpellTimeNeed
+local detectedSkillshots = {}
 
 local callbackList = {}
 local function callback(unit, spellProc)
@@ -236,22 +241,24 @@ local function callback(unit, spellProc)
 		callbackFunc(unit, spellProc)
 	end
 end
+
 -- test only
--- callback = function()
-	-- if CanUseSpell(myHero,_E) == READY then
-	-- 	CastSpell(_E)
-	-- end
--- end
+if debug then
+	table.insert(callbackList, function()
+		if CanUseSpell(myHero,_E) == READY then
+			CastSpell(_E)
+		end
+	end)
+end
 
 function addAntiCCCallback( callback )
 	table.insert(callbackList, callback)
 end
 
-local m_unit, m_spellProc
+-- local m_unit, m_spellProc
 function OnProcessSpellCallback(unit, spellProc)
 	local CCSpell = CC[spellProc.name]
-	if CCSpell and GetTeam(unit) ~= GetTeam(myHero) then
-	-- if CCSpell then
+	if CCSpell and (GetTeam(unit) ~= GetTeam(myHero) or debug) then
 
 		if CCSpell.spellType == "target" and spellProc.target == myHero then
 			if callback then callback(unit, spellProc) end
@@ -262,18 +269,33 @@ function OnProcessSpellCallback(unit, spellProc)
 			if pred.HitChance == 1 then
 				local CCVector = Vector(Vector(spellProc.endPos)-Vector(spellProc.startPos)):normalized()*CCSpell.spellRange
 				
-				CCSpellTimeNeed = CCSpell.spellRange / (CCSpell.projectileSpeed+50) * 1000 + CCSpell.spellDelay				
-				WayOnTime = CCVector/CCSpellTimeNeed
-				startTime = GetTickCount()
-				stargingPos = spellProc.startPos
-				endingPos = spellProc.startPos + CCVector
-				radius = CCSpell.spellRadius
+				local CCSpellTimeNeed = CCSpell.spellRange / (CCSpell.projectileSpeed+50) * 1000 + CCSpell.spellDelay				
+				local WayOnTime = CCVector/CCSpellTimeNeed
+				local startTime = GetTickCount()
+				local stargingPos = spellProc.startPos
+				local endingPos = spellProc.startPos + CCVector
+				local radius = CCSpell.spellRadius
 
-				-- local gg =  GetOrigin(myHero) + CCVector:perpendicular():normalized()* 300
-				-- MoveToXYZ(gg)
+				table.insert(detectedSkillshots, {
+					CCSpellTimeNeed = CCSpellTimeNeed,
+					WayOnTime = WayOnTime,
+					startTime = startTime,
+					stargingPos = stargingPos,
+					endingPos = endingPos,
+					radius = radius,
+					m_unit = unit,
+					m_spellProc = spellProc
+					})
 
-				m_unit = unit
-				m_spellProc = spellProc
+				if debug then
+					local gg =  GetOrigin(myHero) + CCVector:perpendicular():normalized()* (radius + GetHitBox(myHero)*1.8 + 200)
+					local gg2 =  GetOrigin(myHero) - CCVector:perpendicular():normalized()* (radius + GetHitBox(myHero)*1.8 + 200)
+					if GetDistance(gg, stargingPos) > GetDistance(gg2, stargingPos) then
+						MoveToXYZ(gg2)
+					else
+						MoveToXYZ(gg)
+					end
+				end				
 			end
 		end
 		
@@ -295,38 +317,65 @@ end
 
 OnProcessSpell(OnProcessSpellCallback)
 
+local lastcast = 0
 OnDraw(function (myHero)
-	-- local mousePos = GetMousePos()
-	-- DrawCircle(mousePos, 100,0,0,0xffffffff)
-	-- local mousePos2 = WorldToScreen(1, mousePos)
-	-- DrawText("x:"..mousePos.x.." y:"..mousePos.y.." z:"..mousePos.z,24,mousePos2.x,mousePos2.y+50,ARGB(255,0,255,0))
-	-- -- dummy spell
-	-- if KeyIsDown(17) then
-	-- 	local spellProc = {}
-	-- 	spellProc.name = "DarkBindingMissile"
-	-- 	spellProc.startPos = GetMousePos()
-	-- 	spellProc.endPos = GetOrigin(myHero)		
-	-- 	OnProcessSpellCallback(myHero, spellProc)
-	-- end	
+	if debug then
+		local mousePos = GetMousePos()
+		DrawCircle(mousePos, 100,0,0,0xffffffff)
+		local mousePos2 = WorldToScreen(1, mousePos)
+		DrawText("x:"..mousePos.x.." y:"..mousePos.y.." z:"..mousePos.z,24,mousePos2.x,mousePos2.y+50,ARGB(255,0,255,0))
+	end
+
+
+	-- dummy spell
+	if debug and KeyIsDown(17) and lastcast + 300 < GetTickCount() then
+		local spellProc = {}
+		spellProc.name = "DarkBindingMissile"
+		spellProc.startPos = GetMousePos()
+		spellProc.endPos = GetOrigin(myHero)		
+		OnProcessSpellCallback(myHero, spellProc)
+		lastcast = GetTickCount()
+	end	
 	
-	if startTime then
-		local spellPos = stargingPos + ( (GetTickCount() - startTime) * WayOnTime)
+	for index,skillshot in ipairs(detectedSkillshots) do
+		local spellPos = skillshot.stargingPos + ( (GetTickCount() - skillshot.startTime) * skillshot.WayOnTime)
 
-		DrawCircle(endingPos, radius,3,255,0xff0ffff0)
-		DrawCircle(spellPos, radius+GetHitBox(myHero)*1.8,1,255,0xffffffff)
+		DrawCircle(skillshot.endingPos, skillshot.radius,3,255,0xff0ffff0)
+		DrawCircle(spellPos, skillshot.radius+GetHitBox(myHero)*1.8,1,255,0xffffffff)
 		
-		-- local s = WorldToScreen(1, stargingPos)
-		-- local e = WorldToScreen(1, endingPos)
-		-- DrawLine(s.x,s.y,e.x,e.y,10,ARGB(255,255,255,255))
-
-		if GetDistance(spellPos) <= radius+GetHitBox(myHero)*1.8 then
-			if callback then callback(m_unit, m_spellProc) end
+		if debug then
+			local s = WorldToScreen(1, skillshot.stargingPos)
+			local e = WorldToScreen(1, skillshot.endingPos)
+			DrawLine(s.x,s.y,e.x,e.y,10,ARGB(255,255,255,255))
 		end
 
-		if GetTickCount() >= (startTime + CCSpellTimeNeed) then
-			startTime = nil
+		if GetDistance(spellPos) <= skillshot.radius+GetHitBox(myHero)*1.8 then
+			if callback then callback(skillshot.m_unit, skillshot.m_spellProc) end
+		end
+
+		if GetTickCount() >= (skillshot.startTime + skillshot.CCSpellTimeNeed) then
+			skillshot = nil
+			table.remove(detectedSkillshots, index)
 		end
 	end
+	-- if startTime then
+	-- 	local spellPos = stargingPos + ( (GetTickCount() - startTime) * WayOnTime)
+
+	-- 	DrawCircle(endingPos, radius,3,255,0xff0ffff0)
+	-- 	DrawCircle(spellPos, radius+GetHitBox(myHero)*1.8,1,255,0xffffffff)
+		
+	-- 	-- local s = WorldToScreen(1, stargingPos)
+	-- 	-- local e = WorldToScreen(1, endingPos)
+	-- 	-- DrawLine(s.x,s.y,e.x,e.y,10,ARGB(255,255,255,255))
+
+	-- 	if GetDistance(spellPos) <= radius+GetHitBox(myHero)*1.8 then
+	-- 		if callback then callback(m_unit, m_spellProc) end
+	-- 	end
+
+	-- 	if GetTickCount() >= (startTime + CCSpellTimeNeed) then
+	-- 		startTime = nil
+	-- 	end
+	-- end
 end)
 
 PrintChat("anti CC loaded")
