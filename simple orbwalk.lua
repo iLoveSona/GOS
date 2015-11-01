@@ -31,7 +31,7 @@ local function CastOffensiveItems(unit)
   return false
 end
 
-local nextAttackTime = 0
+local nextAttackTime = - math.huge
 local isAttackOn = true
 function canAttack(setting)
 	if setting then
@@ -41,7 +41,7 @@ function canAttack(setting)
 	end
 end
 
-local nextMoveTime = 0
+local nextMoveTime = - math.huge
 local isMoveOn = true
 function canMove(setting)
 	if setting then 
