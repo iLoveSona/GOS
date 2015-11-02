@@ -104,7 +104,7 @@ OnProcessSpell(function(unit, spellProc)
 		elseif n>1 then
 			--print("Looking for "..GetCastName(unit,slot))			--DEBUG
 			local name = spellProc.name
-			if name == slot or name == GetCastName(unit, slot)  then
+			if name == slot or (type(slot)=="number" and name == GetCastName(unit, slot))  then
 				PrintChat("Q'd on "..spellProc.name.." with "..delayTime.."ms delay")
 				delay(function()
 					--PrintChat("USED Q")
