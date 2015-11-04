@@ -62,13 +62,12 @@ addResetAASpell(function()
 		return false
   end
 end)
--- OnProcessSpellComplete(function(unit, spell)    
---   if unit == myHero and spell.name:lower():find("attack") and combo.getValue() then
---    	if CanUseSpell(myHero,_Q) == READY then		
--- 			shouldReset = true
---    	end
---   end
--- end)
+
+OnProcessSpellComplete(function(unit, spell)    
+  -- if unit == myHero and spell.name == "VayneTumble" then
+		-- resetAA()
+  -- end
+end)
 
 OnProcessSpell(function(unit, spell)
 	if unit == myHero and spell.name == "VayneTumble" then

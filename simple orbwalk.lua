@@ -67,7 +67,7 @@ local function orbwalk()
 end
 
 function resetAA()
-  nextAttackTime = 0
+  nextAttackTime = - math.huge
 end
 
 local resetAASpell = nil
