@@ -37,7 +37,7 @@ local ultDelay = ultMenu.addItem(MenuSlider.new("[auto/semi auto] ult delay(defa
 local ultKey = ultMenu.addItem(MenuKeyBind.new("[manual] ult Key", string.byte("T")))
 
 local semiAuto = false
-local semiAutoDelay = 0
+local semiAutoDelay = - math.huge
 
 local isCastingQ = false
 local qTime = 0
