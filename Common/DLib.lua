@@ -1,6 +1,9 @@
-local version = 26
+local version = 27
 
 local require2 = _G.require
+local DrawText = _G.DrawText
+local DrawCircle = _G.DrawCircle
+local FillRect = _G.FillRect
 
 libTable = {
 	-- ["DLib"] = "iLoveSona/GOS/master/Common/DLib.lua",
@@ -2044,6 +2047,13 @@ c.load()
 
 menu=MainMenu.new()
 updaterActive=menu.addItem(MenuBool.new("Updater active", true))
+
+streammode=menu.addItem(MenuBool.new("stream mode(press F6F6 after change this settings)", false))
+if streammode.getValue() then
+	_G.DrawText = function ( ... ) end
+	_G.DrawCircle = function ( ... ) end
+	_G.FillRect = function ( ... ) end
+end
 
 g=prequire("GOSUtility")
 if g then
