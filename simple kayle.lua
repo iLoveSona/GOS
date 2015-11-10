@@ -14,7 +14,7 @@ OnTick(function(myHero)
 		if IsInDistance(target, GetCastRange(myHero,_Q)) and CanUseSpell(myHero, _Q) == READY then	
 			CastTargetSpell(target, _Q) 
 		end
-		if Smite and IsInDistance(target, GetCastRange(myHero,Smite)) and CanUseSpell(myHero, Smite) then
+		if Smite and IsInDistance(target, GetCastRange(myHero,Smite)) and CanUseSpell(myHero, Smite) == READY then
 			CastTargetSpell(target, Smite)
 		end
 	end
