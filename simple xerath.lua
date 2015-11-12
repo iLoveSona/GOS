@@ -35,6 +35,7 @@ local ultSearchRange = ultMenu.addItem(MenuSlider.new("[semi auto] ult search ra
 local ultMode = ultMenu.addItem(MenuStringList.new("ult mode", {"auto", "manual"}, 1))
 local ultDelay = ultMenu.addItem(MenuSlider.new("[auto/semi auto] ult delay(default 800)", 800, 0, 2000, 100))
 local ultKey = ultMenu.addItem(MenuKeyBind.new("[manual] ult Key", string.byte("T")))
+local ultDrawRange = ultMenu.addItem(MenuBool.new("draw ult range circle", true))
 
 local semiAuto = false
 local semiAutoDelay = - math.huge
@@ -175,6 +176,13 @@ local function killableInfo()
   end
 end
 
+OnDrawMinimap(function()
+	if ultDrawRange.getValue() then
+		-- draw r range circle on mini map
+		DrawCircleMinimap(GetOrigin(myHero), rRange, 0, 255, 0xff00ffff)
+	end
+end)
+
 OnDraw(function(myHero)
 	DrawDebugText("Q range "..GetCastRange(myHero,_Q),20,200,30,0xff00ff00)
 	DrawDebugText("R range "..GetCastRange(myHero,_R),20,0,30,0xff00ff00)
@@ -189,6 +197,11 @@ OnDraw(function(myHero)
 	if isCastingR and (semiUltMode.getValue() or semiAuto) then
 		local mousePos = GetMousePos()
 		DrawCircle(mousePos.x,mousePos.y,mousePos.z,ultSearchRange.getValue(),0,0,0xff0000ff)
+	end
+
+	if ultDrawRange.getValue() then
+		-- draw r range circle
+		DrawCircle(GetOrigin(myHero), rRange,0, 255, 0xff00ffff)
 	end
 end)
 
