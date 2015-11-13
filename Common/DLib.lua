@@ -1,4 +1,4 @@
-local version = 27
+local version = 28
 
 local require2 = _G.require
 local DrawText = _G.DrawText
@@ -2048,11 +2048,42 @@ c.load()
 menu=MainMenu.new()
 updaterActive=menu.addItem(MenuBool.new("Updater active", true))
 
-streammode=menu.addItem(MenuBool.new("stream mode(press F6F6 after change this settings)", false))
+local streammode=menu.addItem(MenuBool.new("stream mode(press F6F6 after change this settings)", false))
 if streammode.getValue() then
 	_G.DrawText = function ( ... ) end
 	_G.DrawCircle = function ( ... ) end
 	_G.FillRect = function ( ... ) end
+end
+
+local fixOnRemoveBuff = menu.addItem(MenuBool.new("fix OnRemoveBuff api(press F6F6 after change this settings)", false))
+local OnRemoveBuffCallbackList = {}
+local trackBuffList = {}
+if fixOnRemoveBuff.getValue() then
+	_G.OnRemoveBuff = function (callback)
+		table.insert(OnRemoveBuffCallbackList, callback)
+	end
+
+	OnUpdateBuff(function(object,buffProc)
+		if trackBuffList[object] then
+			trackBuffList[object][buffProc.Name] = buffProc
+		else
+			trackBuffList[object] = {}
+			trackBuffList[object][buffProc.Name] = buffProc
+		end
+	end)
+
+	OnTick(function(myHero)
+		for object,buffProcList in pairs(trackBuffList) do
+			for buffName,buffProc in pairs(buffProcList) do
+				if GotBuff(myHero, buffName) == 0 then					
+					for _,callback in pairs(OnRemoveBuffCallbackList) do
+						callback(object, buffProc)
+					end
+					trackBuffList[object][buffName] = nil
+				end
+			end
+		end
+	end)
 end
 
 g=prequire("GOSUtility")

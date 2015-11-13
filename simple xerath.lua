@@ -184,8 +184,8 @@ OnDrawMinimap(function()
 end)
 
 OnDraw(function(myHero)
-	DrawDebugText("Q range "..GetCastRange(myHero,_Q),20,200,30,0xff00ff00)
-	DrawDebugText("R range "..GetCastRange(myHero,_R),20,0,30,0xff00ff00)
+	DrawDebugText("Q default range "..GetCastRange(myHero,_Q),20,200,30,0xff00ff00)
+	DrawDebugText("R default range "..GetCastRange(myHero,_R),20,0,30,0xff00ff00)
 
 	if semiAuto then
 		DrawText("semi-auto R mode : ON", 40,600,200,0xffffff00)
