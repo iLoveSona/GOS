@@ -18,6 +18,7 @@ local submenu = menu.addItem(SubMenu.new("simple ward jump for "..name))
 local key = submenu.addItem(MenuKeyBind.new("ward jump key", string.byte("Z")))
 local detectWall = submenu.addItem(MenuBool.new("detect wall", true))
 local debugmode = submenu.addItem(MenuBool.new("debug mode", false))
+local drawWardRange = submenu.addItem(MenuBool.new("draw ward range", false))
 
 
 -- local everything as much as possible for fps(not really work)
@@ -31,17 +32,22 @@ local debug = debugmode.getValue()
 
 -- copy from perfect ward
 local wardItems = {
-	{ id = 3340, name = "TrinketTotemLvl1"},
+	{ id = 3711, name = "Tracker's Knife"},
+	{ id = 2303, name = "Eye of the Equinox"},
+	{ id = 2301, name = "Eye of the Watchers"},
+	{ id = 2302, name = "Eye of the Oasis"},
+	{ id = 3340, name = "TrinketTotemLvl1"},--Warding Totem (Trinket)
 	{ id = 3350, name = "TrinketTotemLvl2"},
-	{ id = 3361, name = "TrinketTotemLvl3"},
-	{ id = 3362, name = "TrinketTotemLvl3B"},
-	-- { id = 3154, name = "wrigglelantern"},
+	{ id = 3361, name = "TrinketTotemLvl3"},--Greater Stealth Totem (Trinket)
+	{ id = 3362, name = "TrinketTotemLvl3B"},--Greater Vision Totem (Trinket)
+	-- { id = 3363, name = ""},--Farsight Alteration
+	{ id = 3154, name = "wrigglelantern"},--Wriggle's Lantern
 	-- { id = 3160, name = "FeralFlare"},
-	{ id = 2045, name = "ItemGhostWard"},
-	{ id = 2049, name = "ItemGhostWard"},
-	{ id = 2050, name = "ItemMiniWard"},
+	{ id = 2045, name = "ItemGhostWard"},--Ruby Sightstone
+	{ id = 2049, name = "ItemGhostWard"},--Sightstone
+	{ id = 2050, name = "ItemMiniWard"},--Explorer's Ward
 	{ id = 2044, name = "sightward"},
-	{ id = 2043, name = "VisionWard"}
+	{ id = 2043, name = "VisionWard"}--Vision Ward
 }
 
 local jumpTarget
@@ -139,15 +145,15 @@ end
 
 local function drawDebugInfo()
 	if mousePos then
-		DrawCircle(mousePos.x,mousePos.y,mousePos.z,200,0,0,0xff00ff00);
+		DrawCircle(mousePos.x,mousePos.y,mousePos.z,200,0,0,0xff00ff00)
 	end
 	if wardpos then
-		DrawCircle(wardpos.x,wardpos.y,wardpos.z,200,0,0,0xffffff00);
+		DrawCircle(wardpos.x,wardpos.y,wardpos.z,200,0,0,0xffffff00)
 	end
 	if maxPos then
-		DrawCircle(maxPos.x,maxPos.y,maxPos.z,200,0,0,0xffff0000);
+		DrawCircle(maxPos.x,maxPos.y,maxPos.z,200,0,0,0xffff0000)
 	end
-	DrawCircle( GetOrigin(myHero).x,GetOrigin(myHero).y,GetOrigin(myHero).z,GetCastRange(myHero,spellSlot),0,0,0xffffffff);
+	DrawCircle( GetOrigin(myHero).x,GetOrigin(myHero).y,GetOrigin(myHero).z,GetCastRange(myHero,spellSlot),0,0,0xffffffff)
 
 	if jumpTarget then
 		DrawText("jumpTarget : "..GetObjectName(jumpTarget),20,0,100,0xffffff00)
@@ -238,7 +244,10 @@ local function GetJumpTarget()
 end
 
 OnDraw(function()
-	if debug then	drawDebugInfo()	end	
+	if debug then	drawDebugInfo()	end
+	if drawWardRange.getValue() then 
+		DrawCircle(GetOrigin(myHero),wardRange,0,0,0xffffffff) 
+	end
 end)
 
 OnTick(function(myHero)
