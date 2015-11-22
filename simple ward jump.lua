@@ -47,7 +47,8 @@ local wardItems = {
 	{ id = 2049, name = "ItemGhostWard"},--Sightstone
 	{ id = 2050, name = "ItemMiniWard"},--Explorer's Ward
 	{ id = 2044, name = "sightward"},
-	{ id = 2043, name = "VisionWard"}--Vision Ward
+	{ id = 2043, name = "VisionWard"},--Vision Ward
+	{ id = 1408, name = "Enchantment: Warrior"}-- Tracker's Knife(Warrior)
 }
 
 local jumpTarget
