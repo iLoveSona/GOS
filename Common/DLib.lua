@@ -2090,7 +2090,7 @@ g=prequire("GOSUtility")
 if g then
 	local UP=Updater.new("iLoveSona/GOS/master/Common/DLib.lua", "Common\\DLib", version)
 	if UP.newVersion() then UP.update() end
-	if gVersion()<7 then 
+	if gVersion()<8 then 
 		notification("plz Redownload GOSUtility", 10000) 
 	else
 		local versionCode = lolVersion()
