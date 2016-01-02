@@ -1,4 +1,4 @@
-local version = 28
+local version = 29
 
 local require2 = _G.require
 local DrawText = _G.DrawText
@@ -1057,12 +1057,12 @@ function MenuStringList.new(name, stringlist, index)
 		if isShow and key==1 and pressed then
 			if this.leftRectangle.contains(mouseVector) then
 				if this.selectedIndex==1 then 
-					this.selectedIndex=table.getn(this.stringlist)
+					this.selectedIndex=#this.stringlist
 				else
 					this.selectedIndex=this.selectedIndex-1
 				end
 			elseif this.rightRectangle.contains(mouseVector) then
-				if this.selectedIndex==table.getn(this.stringlist) then 
+				if this.selectedIndex==#this.stringlist then 
 					this.selectedIndex=1
 				else
 					this.selectedIndex=this.selectedIndex+1
@@ -1076,7 +1076,7 @@ function MenuStringList.new(name, stringlist, index)
 	end
 	
 	function this.setValue(va)
-		this.selectedIndex=(math.abs(round(va-1))%table.getn(this.stringlist))+1
+		this.selectedIndex=(math.abs(round(va-1))%#this.stringlist)+1
 	end
 	
 	function this.expand(newWidth)
@@ -1363,8 +1363,8 @@ end
 function registerInputListener(listener)
 	if type(listener)=="function" then
 		inputEventsActive=true
-		subscribers[table.getn(subscribers)+1]=listener
-		return table.getn(subscribers)
+		subscribers[#subscribers+1]=listener
+		return #subscribers
 	else
 		PrintChat("Script tried to register non function as an event listener!")
 	end
