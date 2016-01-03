@@ -221,7 +221,11 @@ CC = {
 ["LissandraR"] 						= 	{ slot = _R , champName = "Lissandra"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
 ["BlindMonkR"] 						= 	{ slot = _R , champName = "LeeSin"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
 ["zedult"] 						= 	{ slot = _R , champName = "Zed"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
-["infiniteduresschannel"] 						= 	{ slot = _R , champName = "Warwick"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	}
+["infiniteduresschannel"] 						= 	{ slot = _R , champName = "Warwick"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 450		, collision = false	},
+
+--AA
+["RenektonExecute"] 						= 	{ slot = _W , champName = "Renekton"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 250		, collision = false	},
+["RenektonSuperExecute"] 						= 	{ slot = _W , champName = "Renekton"				, spellType = "target" 		, projectileSpeed = math.huge	, spellDelay = 250	, spellRange = 250		, spellRadius = 250		, collision = false	}
 }
 
 local debug = false
