@@ -69,8 +69,13 @@ OnTick(function(myHero)
 	local newLv = GetLevel(myHero)
 
 	-- only level spell when level up
-	if lv == newLv then return end
-	lv = newLv
+	-- if lv == newLv then return end
+	
+	local points = GetLevelPoints(myHero)
+	-- only level spell when we have level points
+	if points <= 0 then return end
+	-- support multi points
+	lv = newLv - points + 1
 
 	if disableAtLv1.getValue() and lv == 1 then return end
 	-- if lv < 6 then return end
