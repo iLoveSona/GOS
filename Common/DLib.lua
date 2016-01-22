@@ -1,4 +1,4 @@
-local version = 29
+local version = 30
 
 local require2 = _G.require
 local DrawText = _G.DrawText
@@ -20,6 +20,18 @@ libTable = {
 	["2DGeometry"] = "Maxxxel/GOS/master/Common/Utility/2DGeometry.lua",
 	["IsFacing"] = "Maxxxel/GOS/master/Common/Utility/IsFacing.lua"
 }
+
+local function mousePos()
+	local pos
+	if g then 
+		pos=g.mousePos() 
+		return Vector2.new(pos[1], pos[2])
+	else
+		pos=GetMousePos()
+		pos=WorldToScreen(1, pos.x, pos.y, pos.z)
+		return Vector2.new(pos)
+	end
+end
 
 -- better handle require error
 function require( m, hideErr )
@@ -1306,17 +1318,17 @@ function webRequest(server, address)
 	if result=="" or result=="Not found" then return nil end
 	return result end
 	
-function mousePos()
-	local pos
-	if g then 
-		pos=g.mousePos() 
-		return Vector2.new(pos[1], pos[2])
-	else
-		pos=GetMousePos()
-		pos=WorldToScreen(1, pos.x, pos.y, pos.z)
-		return Vector2.new(pos)
-	end
-end
+-- function mousePos()
+-- 	local pos
+-- 	if g then 
+-- 		pos=g.mousePos() 
+-- 		return Vector2.new(pos[1], pos[2])
+-- 	else
+-- 		pos=GetMousePos()
+-- 		pos=WorldToScreen(1, pos.x, pos.y, pos.z)
+-- 		return Vector2.new(pos)
+-- 	end
+-- end
 
 function getResolution()
 	local res = g.resolution()
@@ -2117,7 +2129,7 @@ OnDraw(function()
 	menu.onLoop()
 end)
 
-PrintChat("[DLib] : loaded")
+PrintChat("[DLib] v"..version.." : loaded")
 
 --Inspired lib----------------------------------------------------------------
 -- copy paste some useful api coz too lazy to require two lib....
