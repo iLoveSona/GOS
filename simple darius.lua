@@ -11,10 +11,18 @@ local GetDistance = d.GetDistance
 
 local submenu = menu.addItem(SubMenu.new("simple darius"))
 local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
+local drawQCircle = submenu.addItem(MenuBool.new("draw Q circle", false))
 
 addInterrupterCallback(function(target, spellType, spell)
 	if IsInDistance(target, GetCastRange(myHero, _E)) and CanUseSpell(myHero,_E) == READY and spellType == CHANELLING_SPELLS then
 		CastSkillShot(_E,GetOrigin(target))
+	end
+end)
+
+OnDraw(function(myHero)
+	if drawQCircle.getValue() then
+		DrawCircle(GetOrigin(myHero),205+GetHitBox(myHero),0,0,0xffff0000)
+		DrawCircle(GetOrigin(myHero),425,0,0,0xffff0000)
 	end
 end)
 
