@@ -1,4 +1,4 @@
-local version = 30
+local version = 31
 
 local require2 = _G.require
 local DrawText = _G.DrawText
@@ -2508,7 +2508,7 @@ function ilib.init()
 	local initHeroCounter = 0
 	-- local print = print
 	-- PrintChat not work here...don't know why(will miss print something)
-	OnObjectLoad(function(object,myHero)
+	OnObjectLoad(function(object)
 		if initHeroCounter >= 9 then return end
 		-- if done then return end
 
