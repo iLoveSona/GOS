@@ -283,7 +283,7 @@ OnTick(function(myHero)
 	wardpos = nil
 end)
 
-OnObjectLoop(function(object,myHero)
+-- OnObjectLoop(function(object,myHero)
 
 	-- if jumpTarget then return end
 	-- if not mousePos or not validTarget(object) then return end
@@ -303,7 +303,7 @@ OnObjectLoop(function(object,myHero)
  --   	jumpTarget = object
  --   	return
  --  end
-end)
+-- end)
 
 OnProcessSpell(function(unit,spell)
 	-- if not debug then return end
