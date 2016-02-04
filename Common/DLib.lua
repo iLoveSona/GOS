@@ -1,4 +1,4 @@
-local version = 31
+local version = 32
 
 local require2 = _G.require
 local DrawText = _G.DrawText
@@ -2405,8 +2405,9 @@ function ilib.IsInDistance(p1,r)
 end
 
 function ilib.GetDistance(p1,p2)
+	-- PrintChat(debug.getinfo(2).name)
   p1 = GetOrigin(p1) or p1
-  p2 = GetOrigin(p2) or p2 or GetOrigin(myHero)
+  p2 = (p2 and GetOrigin(p2)) or GetOrigin(myHero)
   return math.sqrt(ilib.GetDistanceSqr(p1,p2))
 end
 

@@ -35,11 +35,12 @@ local passtiveList = {
 require('simple orbwalk')
 
 local objectList = {}
+local buffList = {}
 
 local function getNearestPos()
 	local result = nil
 	local distanceTemp = math.huge
-	for _,obj in pairs(objectList) do
+	for _,obj in pairs(buffList) do
 		local origin = GetOrigin(obj)
 		if origin then
 			local distance = passtiveList[GetObjectBaseName(obj)]
@@ -59,7 +60,21 @@ local function getNearestPos()
 	return result, distanceTemp
 end
 
+local function processObjectList()
+	local tempObjectList = {}
+	for _,object in ipairs(objectList) do
+		local id = GetNetworkID(object)
+		if id then
+			buffList[id] = object
+		else
+			table.insert(tempObjectList, object)
+		end
+	end
+	objectList = tempObjectList
+end
+
 OnTick(function(myHero)
+	processObjectList()
 	local buff_pos, distance = getNearestPos()
 	if buff_pos and combo.getValue() and distance > 100 then
 		if CanUseSpell(myHero,_Q) == READY and distance < GetCastRange(myHero,_Q) then
@@ -75,7 +90,7 @@ end)
 
 OnDraw(function(myHero)
 	if debug then
-		for _,obj in pairs(objectList) do
+		for _,obj in pairs(buffList) do
 			local origin = GetOrigin(obj)
 			if origin then
 				local distance = passtiveList[GetObjectBaseName(obj)]
@@ -102,7 +117,7 @@ end)
 
 OnCreateObj(function(object)
 	if passtiveList[GetObjectBaseName(object)] then
-		objectList[object] = object
+		table.insert(objectList, object)
 	end
 
 	if debug and GetObjectBaseName(object):find("Fiora_Base") and not GetObjectBaseName(object):lower():find("speed")then
@@ -117,7 +132,7 @@ end)
 
 OnDeleteObj(function(object)
 	if passtiveList[GetObjectBaseName(object)] then
-		objectList[object] = nil
+		buffList[GetNetworkID(object)] = nil
 	end
 end)
 
