@@ -4,6 +4,7 @@ local myHero = GetMyHero()
 d = require 'DLib'
 local GetTarget = d.GetTarget
 local GetDistance = d.GetDistance
+local IsInDistance = d.IsInDistance
 
 local submenu = menu.addItem(SubMenu.new("simple orbwalk"))
 local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
@@ -75,14 +76,27 @@ function addResetAASpell(resetAASpell0)
   resetAASpell = resetAASpell0
 end
 
+local function castSmite()
+  if Smite then
+    local range = GetCastRange(myHero,Smite)
+    local target = GetTarget(range, DAMAGE_PHYSICAL)
+    if target and IsInDistance(target, range) and CanUseSpell(myHero, Smite) == READY then
+      CastTargetSpell(target, Smite)
+    end
+  end
+end
+
 OnTick(function(myHero)
 	if combo.getValue() then
-		orbwalk()
+    orbwalk()
+    castSmite()
 	end
 end)
 
-OnProcessSpell(function(unit, spellProc)
-  if unit == myHero and spellProc.name:lower():find("attack") then
+OnProcessSpellAttack(function(unit, spellProc)
+  -- local name = spellProc.name
+  -- if unit == myHero and (name:lower():find("attack") or name:find("XenZhaoThrust")) then
+  if unit == myHero then  
     local windup = spellProc.windUpTime * 1000
   	if GetObjectType(spellProc.target) == Obj_AI_Hero then
       delay(function()
