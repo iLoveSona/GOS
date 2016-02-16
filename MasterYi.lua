@@ -4,6 +4,7 @@ if GetObjectName(myHero) ~= "MasterYi" then return end
 
 local d = require 'DLib'
 local ValidTarget = d.ValidTarget
+local GetTarget = d.GetTarget
 
 local myTeam = GetTeam(myHero)
 local delayTime=0
@@ -112,6 +113,16 @@ OnProcessSpell(function(unit, spellProc)
 				end, delayTime)
 				delayTime=0
 			end
+		end
+	end
+end)
+
+OnTick(function(myHero)
+	if Smite and KeyIsDown(32) then
+		local range = GetCastRange(myHero,Smite)
+		local target = GetTarget(range, DAMAGE_PHYSICAL)
+		if target and IsInDistance(target, range) and CanUseSpell(myHero, Smite) == READY then
+			CastTargetSpell(target, Smite)
 		end
 	end
 end)
