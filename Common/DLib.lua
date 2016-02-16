@@ -2133,262 +2133,262 @@ PrintChat("[DLib] v"..version.." : loaded")
 
 --Inspired lib----------------------------------------------------------------
 -- copy paste some useful api coz too lazy to require two lib....
-function VectorType(v)
-    v = GetOrigin(v) or v
-    return v and v.x and type(v.x) == "number" and ((v.y and type(v.y) == "number") or (v.z and type(v.z) == "number"))
-end
+-- function VectorType(v)
+--     v = GetOrigin(v) or v
+--     return v and v.x and type(v.x) == "number" and ((v.y and type(v.y) == "number") or (v.z and type(v.z) == "number"))
+-- end
 
-class 'Vector'
+-- class 'Vector'
 
-function Vector:__init(a, b, c)
-    if a == nil then
-        self.x, self.y, self.z = 0.0, 0.0, 0.0
-    elseif b == nil then
-        a = GetOrigin(a) or a
-        assert(VectorType(a), "Vector: wrong argument types (expected nil or <Vector> or 2 <number> or 3 <number>)")
-        self.x, self.y, self.z = a.x, a.y, a.z
-    else
-        assert(type(a) == "number" and (type(b) == "number" or type(c) == "number"), "Vector: wrong argument types (<Vector> or 2 <number> or 3 <number>)")
-        self.x = a
-        if b and type(b) == "number" then self.y = b end
-        if c and type(c) == "number" then self.z = c end
-    end
-end
+-- function Vector:__init(a, b, c)
+--     if a == nil then
+--         self.x, self.y, self.z = 0.0, 0.0, 0.0
+--     elseif b == nil then
+--         a = GetOrigin(a) or a
+--         assert(VectorType(a), "Vector: wrong argument types (expected nil or <Vector> or 2 <number> or 3 <number>)")
+--         self.x, self.y, self.z = a.x, a.y, a.z
+--     else
+--         assert(type(a) == "number" and (type(b) == "number" or type(c) == "number"), "Vector: wrong argument types (<Vector> or 2 <number> or 3 <number>)")
+--         self.x = a
+--         if b and type(b) == "number" then self.y = b end
+--         if c and type(c) == "number" then self.z = c end
+--     end
+-- end
 
-function Vector:__type()
-    return "Vector"
-end
+-- function Vector:__type()
+--     return "Vector"
+-- end
 
-function Vector:__add(v)
-    assert(VectorType(v) and VectorType(self), "add: wrong argument types (<Vector> expected)")
-    return Vector(self.x + v.x, (v.y and self.y) and self.y + v.y, (v.z and self.z) and self.z + v.z)
-end
+-- function Vector:__add(v)
+--     assert(VectorType(v) and VectorType(self), "add: wrong argument types (<Vector> expected)")
+--     return Vector(self.x + v.x, (v.y and self.y) and self.y + v.y, (v.z and self.z) and self.z + v.z)
+-- end
 
-function Vector:__sub(v)
-    assert(VectorType(v) and VectorType(self), "Sub: wrong argument types (<Vector> expected)")
-    return Vector(self.x - v.x, (v.y and self.y) and self.y - v.y, (v.z and self.z) and self.z - v.z)
-end
+-- function Vector:__sub(v)
+--     assert(VectorType(v) and VectorType(self), "Sub: wrong argument types (<Vector> expected)")
+--     return Vector(self.x - v.x, (v.y and self.y) and self.y - v.y, (v.z and self.z) and self.z - v.z)
+-- end
 
-function Vector.__mul(a, b)
-    if type(a) == "number" and VectorType(b) then
-        return Vector({ x = b.x * a, y = b.y and b.y * a, z = b.z and b.z * a })
-    elseif type(b) == "number" and VectorType(a) then
-        return Vector({ x = a.x * b, y = a.y and a.y * b, z = a.z and a.z * b })
-    else
-        assert(VectorType(a) and VectorType(b), "Mul: wrong argument types (<Vector> or <number> expected)")
-        return a:dotP(b)
-    end
-end
+-- function Vector.__mul(a, b)
+--     if type(a) == "number" and VectorType(b) then
+--         return Vector({ x = b.x * a, y = b.y and b.y * a, z = b.z and b.z * a })
+--     elseif type(b) == "number" and VectorType(a) then
+--         return Vector({ x = a.x * b, y = a.y and a.y * b, z = a.z and a.z * b })
+--     else
+--         assert(VectorType(a) and VectorType(b), "Mul: wrong argument types (<Vector> or <number> expected)")
+--         return a:dotP(b)
+--     end
+-- end
 
-function Vector.__div(a, b)
-    if type(a) == "number" and VectorType(b) then
-        return Vector({ x = a / b.x, y = b.y and a / b.y, z = b.z and a / b.z })
-    else
-        assert(VectorType(a) and type(b) == "number", "Div: wrong argument types (<number> expected)")
-        return Vector({ x = a.x / b, y = a.y and a.y / b, z = a.z and a.z / b })
-    end
-end
+-- function Vector.__div(a, b)
+--     if type(a) == "number" and VectorType(b) then
+--         return Vector({ x = a / b.x, y = b.y and a / b.y, z = b.z and a / b.z })
+--     else
+--         assert(VectorType(a) and type(b) == "number", "Div: wrong argument types (<number> expected)")
+--         return Vector({ x = a.x / b, y = a.y and a.y / b, z = a.z and a.z / b })
+--     end
+-- end
 
-function Vector.__lt(a, b)
-    assert(VectorType(a) and VectorType(b), "__lt: wrong argument types (<Vector> expected)")
-    return a:len() < b:len()
-end
+-- function Vector.__lt(a, b)
+--     assert(VectorType(a) and VectorType(b), "__lt: wrong argument types (<Vector> expected)")
+--     return a:len() < b:len()
+-- end
 
-function Vector.__le(a, b)
-    assert(VectorType(a) and VectorType(b), "__le: wrong argument types (<Vector> expected)")
-    return a:len() <= b:len()
-end
+-- function Vector.__le(a, b)
+--     assert(VectorType(a) and VectorType(b), "__le: wrong argument types (<Vector> expected)")
+--     return a:len() <= b:len()
+-- end
 
-function Vector:__eq(v)
-    assert(VectorType(v), "__eq: wrong argument types (<Vector> expected)")
-    return self.x == v.x and self.y == v.y and self.z == v.z
-end
+-- function Vector:__eq(v)
+--     assert(VectorType(v), "__eq: wrong argument types (<Vector> expected)")
+--     return self.x == v.x and self.y == v.y and self.z == v.z
+-- end
 
-function Vector:__unm()
-    return Vector(-self.x, self.y and -self.y, self.z and -self.z)
-end
+-- function Vector:__unm()
+--     return Vector(-self.x, self.y and -self.y, self.z and -self.z)
+-- end
 
-function Vector:__vector(v)
-    assert(VectorType(v), "__vector: wrong argument types (<Vector> expected)")
-    return self:crossP(v)
-end
+-- function Vector:__vector(v)
+--     assert(VectorType(v), "__vector: wrong argument types (<Vector> expected)")
+--     return self:crossP(v)
+-- end
 
-function Vector:__tostring()
-    if self.y and self.z then
-        return "(" .. tostring(self.x) .. "," .. tostring(self.y) .. "," .. tostring(self.z) .. ")"
-    else
-        return "(" .. tostring(self.x) .. "," .. self.y and tostring(self.y) or tostring(self.z) .. ")"
-    end
-end
+-- function Vector:__tostring()
+--     if self.y and self.z then
+--         return "(" .. tostring(self.x) .. "," .. tostring(self.y) .. "," .. tostring(self.z) .. ")"
+--     else
+--         return "(" .. tostring(self.x) .. "," .. self.y and tostring(self.y) or tostring(self.z) .. ")"
+--     end
+-- end
 
-function Vector:clone()
-    return Vector(self)
-end
+-- function Vector:clone()
+--     return Vector(self)
+-- end
 
-function Vector:unpack()
-    return self.x, self.y, self.z
-end
+-- function Vector:unpack()
+--     return self.x, self.y, self.z
+-- end
 
-function Vector:len2(v)
-    assert(v == nil or VectorType(v), "dist: wrong argument types (<Vector> expected)")
-    local v = v and Vector(v) or self
-    return self.x * v.x + (self.y and self.y * v.y or 0) + (self.z and self.z * v.z or 0)
-end
+-- function Vector:len2(v)
+--     assert(v == nil or VectorType(v), "dist: wrong argument types (<Vector> expected)")
+--     local v = v and Vector(v) or self
+--     return self.x * v.x + (self.y and self.y * v.y or 0) + (self.z and self.z * v.z or 0)
+-- end
 
-function Vector:len()
-    return math.sqrt(self:len2())
-end
+-- function Vector:len()
+--     return math.sqrt(self:len2())
+-- end
 
-function Vector:dist(v)
-    assert(VectorType(v), "dist: wrong argument types (<Vector> expected)")
-    local a = self - v
-    return a:len()
-end
+-- function Vector:dist(v)
+--     assert(VectorType(v), "dist: wrong argument types (<Vector> expected)")
+--     local a = self - v
+--     return a:len()
+-- end
 
-function Vector:normalize()
-    local a = self:len()
-    self.x = self.x / a
-    if self.y then self.y = self.y / a end
-    if self.z then self.z = self.z / a end
-end
+-- function Vector:normalize()
+--     local a = self:len()
+--     self.x = self.x / a
+--     if self.y then self.y = self.y / a end
+--     if self.z then self.z = self.z / a end
+-- end
 
-function Vector:normalized()
-    local a = self:clone()
-    a:normalize()
-    return a
-end
+-- function Vector:normalized()
+--     local a = self:clone()
+--     a:normalize()
+--     return a
+-- end
 
-function Vector:center(v)
-    assert(VectorType(v), "center: wrong argument types (<Vector> expected)")
-    return Vector((self + v) / 2)
-end
+-- function Vector:center(v)
+--     assert(VectorType(v), "center: wrong argument types (<Vector> expected)")
+--     return Vector((self + v) / 2)
+-- end
 
-function Vector:crossP(other)
-    assert(self.y and self.z and other.y and other.z, "crossP: wrong argument types (3 Dimensional <Vector> expected)")
-    return Vector({
-        x = other.z * self.y - other.y * self.z,
-        y = other.x * self.z - other.z * self.x,
-        z = other.y * self.x - other.x * self.y
-    })
-end
+-- function Vector:crossP(other)
+--     assert(self.y and self.z and other.y and other.z, "crossP: wrong argument types (3 Dimensional <Vector> expected)")
+--     return Vector({
+--         x = other.z * self.y - other.y * self.z,
+--         y = other.x * self.z - other.z * self.x,
+--         z = other.y * self.x - other.x * self.y
+--     })
+-- end
 
-function Vector:dotP(other)
-    assert(VectorType(other), "dotP: wrong argument types (<Vector> expected)")
-    return self.x * other.x + (self.y and (self.y * other.y) or 0) + (self.z and (self.z * other.z) or 0)
-end
+-- function Vector:dotP(other)
+--     assert(VectorType(other), "dotP: wrong argument types (<Vector> expected)")
+--     return self.x * other.x + (self.y and (self.y * other.y) or 0) + (self.z and (self.z * other.z) or 0)
+-- end
 
-function Vector:projectOn(v)
-    assert(VectorType(v), "projectOn: invalid argument: cannot project Vector on " .. type(v))
-    if type(v) ~= "Vector" then v = Vector(v) end
-    local s = self:len2(v) / v:len2()
-    return Vector(v * s)
-end
+-- function Vector:projectOn(v)
+--     assert(VectorType(v), "projectOn: invalid argument: cannot project Vector on " .. type(v))
+--     if type(v) ~= "Vector" then v = Vector(v) end
+--     local s = self:len2(v) / v:len2()
+--     return Vector(v * s)
+-- end
 
-function Vector:mirrorOn(v)
-    assert(VectorType(v), "mirrorOn: invalid argument: cannot mirror Vector on " .. type(v))
-    return self:projectOn(v) * 2
-end
+-- function Vector:mirrorOn(v)
+--     assert(VectorType(v), "mirrorOn: invalid argument: cannot mirror Vector on " .. type(v))
+--     return self:projectOn(v) * 2
+-- end
 
-function Vector:sin(v)
-    assert(VectorType(v), "sin: wrong argument types (<Vector> expected)")
-    if type(v) ~= "Vector" then v = Vector(v) end
-    local a = self:__vector(v)
-    return math.sqrt(a:len2() / (self:len2() * v:len2()))
-end
+-- function Vector:sin(v)
+--     assert(VectorType(v), "sin: wrong argument types (<Vector> expected)")
+--     if type(v) ~= "Vector" then v = Vector(v) end
+--     local a = self:__vector(v)
+--     return math.sqrt(a:len2() / (self:len2() * v:len2()))
+-- end
 
-function Vector:cos(v)
-    assert(VectorType(v), "cos: wrong argument types (<Vector> expected)")
-    if type(v) ~= "Vector" then v = Vector(v) end
-    return self:len2(v) / math.sqrt(self:len2() * v:len2())
-end
+-- function Vector:cos(v)
+--     assert(VectorType(v), "cos: wrong argument types (<Vector> expected)")
+--     if type(v) ~= "Vector" then v = Vector(v) end
+--     return self:len2(v) / math.sqrt(self:len2() * v:len2())
+-- end
 
-function Vector:angle(v)
-    assert(VectorType(v), "angle: wrong argument types (<Vector> expected)")
-    return math.acos(self:cos(v))
-end
+-- function Vector:angle(v)
+--     assert(VectorType(v), "angle: wrong argument types (<Vector> expected)")
+--     return math.acos(self:cos(v))
+-- end
 
-function Vector:affineArea(v)
-    assert(VectorType(v), "affineArea: wrong argument types (<Vector> expected)")
-    if type(v) ~= "Vector" then v = Vector(v) end
-    local a = self:__vector(v)
-    return math.sqrt(a:len2())
-end
+-- function Vector:affineArea(v)
+--     assert(VectorType(v), "affineArea: wrong argument types (<Vector> expected)")
+--     if type(v) ~= "Vector" then v = Vector(v) end
+--     local a = self:__vector(v)
+--     return math.sqrt(a:len2())
+-- end
 
-function Vector:triangleArea(v)
-    assert(VectorType(v), "triangleArea: wrong argument types (<Vector> expected)")
-    return self:affineArea(v) / 2
-end
+-- function Vector:triangleArea(v)
+--     assert(VectorType(v), "triangleArea: wrong argument types (<Vector> expected)")
+--     return self:affineArea(v) / 2
+-- end
 
-function Vector:rotateXaxis(phi)
-    assert(type(phi) == "number", "Rotate: wrong argument types (expected <number> for phi)")
-    local c, s = math.cos(phi), math.sin(phi)
-    self.y, self.z = self.y * c - self.z * s, self.z * c + self.y * s
-end
+-- function Vector:rotateXaxis(phi)
+--     assert(type(phi) == "number", "Rotate: wrong argument types (expected <number> for phi)")
+--     local c, s = math.cos(phi), math.sin(phi)
+--     self.y, self.z = self.y * c - self.z * s, self.z * c + self.y * s
+-- end
 
-function Vector:rotateYaxis(phi)
-    assert(type(phi) == "number", "Rotate: wrong argument types (expected <number> for phi)")
-    local c, s = math.cos(phi), math.sin(phi)
-    self.x, self.z = self.x * c + self.z * s, self.z * c - self.x * s
-end
+-- function Vector:rotateYaxis(phi)
+--     assert(type(phi) == "number", "Rotate: wrong argument types (expected <number> for phi)")
+--     local c, s = math.cos(phi), math.sin(phi)
+--     self.x, self.z = self.x * c + self.z * s, self.z * c - self.x * s
+-- end
 
-function Vector:rotateZaxis(phi)
-    assert(type(phi) == "number", "Rotate: wrong argument types (expected <number> for phi)")
-    local c, s = math.cos(phi), math.sin(phi)
-    self.x, self.y = self.x * c - self.z * s, self.y * c + self.x * s
-end
+-- function Vector:rotateZaxis(phi)
+--     assert(type(phi) == "number", "Rotate: wrong argument types (expected <number> for phi)")
+--     local c, s = math.cos(phi), math.sin(phi)
+--     self.x, self.y = self.x * c - self.z * s, self.y * c + self.x * s
+-- end
 
-function Vector:rotate(phiX, phiY, phiZ)
-    assert(type(phiX) == "number" and type(phiY) == "number" and type(phiZ) == "number", "Rotate: wrong argument types (expected <number> for phi)")
-    if phiX ~= 0 then self:rotateXaxis(phiX) end
-    if phiY ~= 0 then self:rotateYaxis(phiY) end
-    if phiZ ~= 0 then self:rotateZaxis(phiZ) end
-end
+-- function Vector:rotate(phiX, phiY, phiZ)
+--     assert(type(phiX) == "number" and type(phiY) == "number" and type(phiZ) == "number", "Rotate: wrong argument types (expected <number> for phi)")
+--     if phiX ~= 0 then self:rotateXaxis(phiX) end
+--     if phiY ~= 0 then self:rotateYaxis(phiY) end
+--     if phiZ ~= 0 then self:rotateZaxis(phiZ) end
+-- end
 
-function Vector:rotated(phiX, phiY, phiZ)
-    assert(type(phiX) == "number" and type(phiY) == "number" and type(phiZ) == "number", "Rotated: wrong argument types (expected <number> for phi)")
-    local a = self:clone()
-    a:rotate(phiX, phiY, phiZ)
-    return a
-end
+-- function Vector:rotated(phiX, phiY, phiZ)
+--     assert(type(phiX) == "number" and type(phiY) == "number" and type(phiZ) == "number", "Rotated: wrong argument types (expected <number> for phi)")
+--     local a = self:clone()
+--     a:rotate(phiX, phiY, phiZ)
+--     return a
+-- end
 
--- not yet full 3D functions
-function Vector:polar()
-    if math.close(self.x, 0) then
-        if (self.z or self.y) > 0 then return 90
-        elseif (self.z or self.y) < 0 then return 270
-        else return 0
-        end
-    else
-        local theta = math.deg(math.atan((self.z or self.y) / self.x))
-        if self.x < 0 then theta = theta + 180 end
-        if theta < 0 then theta = theta + 360 end
-        return theta
-    end
-end
+-- -- not yet full 3D functions
+-- function Vector:polar()
+--     if math.close(self.x, 0) then
+--         if (self.z or self.y) > 0 then return 90
+--         elseif (self.z or self.y) < 0 then return 270
+--         else return 0
+--         end
+--     else
+--         local theta = math.deg(math.atan((self.z or self.y) / self.x))
+--         if self.x < 0 then theta = theta + 180 end
+--         if theta < 0 then theta = theta + 360 end
+--         return theta
+--     end
+-- end
 
-function Vector:angleBetween(v1, v2)
-    assert(VectorType(v1) and VectorType(v2), "angleBetween: wrong argument types (2 <Vector> expected)")
-    local p1, p2 = (-self + v1), (-self + v2)
-    local theta = p1:polar() - p2:polar()
-    if theta < 0 then theta = theta + 360 end
-    if theta > 180 then theta = 360 - theta end
-    return theta
-end
+-- function Vector:angleBetween(v1, v2)
+--     assert(VectorType(v1) and VectorType(v2), "angleBetween: wrong argument types (2 <Vector> expected)")
+--     local p1, p2 = (-self + v1), (-self + v2)
+--     local theta = p1:polar() - p2:polar()
+--     if theta < 0 then theta = theta + 360 end
+--     if theta > 180 then theta = 360 - theta end
+--     return theta
+-- end
 
-function Vector:compare(v)
-    assert(VectorType(v), "compare: wrong argument types (<Vector> expected)")
-    local ret = self.x - v.x
-    if ret == 0 then ret = self.z - v.z end
-    return ret
-end
+-- function Vector:compare(v)
+--     assert(VectorType(v), "compare: wrong argument types (<Vector> expected)")
+--     local ret = self.x - v.x
+--     if ret == 0 then ret = self.z - v.z end
+--     return ret
+-- end
 
-function Vector:perpendicular()
-    return Vector(-self.z, self.y, self.x)
-end
+-- function Vector:perpendicular()
+--     return Vector(-self.z, self.y, self.x)
+-- end
 
-function Vector:perpendicular2()
-    return Vector(self.z, self.y, -self.x)
-end
+-- function Vector:perpendicular2()
+--     return Vector(self.z, self.y, -self.x)
+-- end
 
 
 local myHero = GetMyHero()
