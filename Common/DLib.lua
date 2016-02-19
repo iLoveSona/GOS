@@ -1,4 +1,4 @@
-local version = 32
+local version = 34
 
 local require2 = _G.require
 local DrawText = _G.DrawText
@@ -2405,17 +2405,29 @@ function ilib.IsInDistance(p1,r)
 end
 
 function ilib.GetDistance(p1,p2)
-	-- PrintChat(debug.getinfo(2).name)
-  p1 = GetOrigin(p1) or p1
+	if not p1 then
+		PrintChat("GetDistance failed : "..debug.getinfo(2).name)
+		return
+	end
+	if p1.x and p1.y and p1.z then
+		-- do nothing
+	else
+  	-- p1 = GetOrigin(p1) or p1
+  	p1 = GetOrigin(p1)
+  end
   p2 = (p2 and GetOrigin(p2)) or GetOrigin(myHero)
   return math.sqrt(ilib.GetDistanceSqr(p1,p2))
 end
 
 function ilib.GetDistanceSqr(p1,p2)
-    p2 = p2 or GetOrigin(myHero)
-    local dx = p1.x - p2.x
-    local dz = (p1.z or p1.y) - (p2.z or p2.y)
-    return dx*dx + dz*dz
+	if not p1 then
+		PrintChat("GetDistanceSqr failed : "..debug.getinfo(2).name)
+		return
+	end
+  p2 = p2 or GetOrigin(myHero)
+  local dx = p1.x - p2.x
+  local dz = (p1.z or p1.y) - (p2.z or p2.y)
+  return dx*dx + dz*dz
 end
 
 local bufflist = {

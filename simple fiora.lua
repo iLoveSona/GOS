@@ -12,11 +12,14 @@ local GetDistance = d.GetDistance
 
 local submenu = menu.addItem(SubMenu.new("simple fiora"))
 local combo = submenu.addItem(MenuKeyBind.new("combo key", string.byte(" ")))
+local autoBlock = submenu.addItem(MenuBool.new("auto W when possible", true))
 
 require 'antiCC'
 addAntiCCCallback(function(unit, spellProc)
-	if CanUseSpell(myHero,_W) == READY then
-		CastSkillShot(_W,GetOrigin(unit))
+	if autoBlock.getValue() or combo.getValue() then
+		if CanUseSpell(myHero,_W) == READY then
+			CastSkillShot(_W,GetOrigin(unit))
+		end
 	end
 end)
 
